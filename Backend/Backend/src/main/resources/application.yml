@@ -12,3 +12,19 @@ spring:
       properties:
           hibernate:
               dialect: org.hibernate.dialect.MySQL5Dialect
+  mail:
+    port: 587
+    host: smtp.gmail.com
+    username: 'datnguyen101004@gmail.com'
+    password: 'bozh ituw vifw qjfu'
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret-key: 'V2VsYzBtZV90MF9teV9ibDBnX3dlYnMxdGVfRGF0X2lzX0FkbTFu'
+  expiredAccess: '6h'
+  expiredRefresh: '3d'

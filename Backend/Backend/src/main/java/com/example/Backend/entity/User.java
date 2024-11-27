@@ -30,11 +30,10 @@ public class User {
     @JsonIgnore
     private String password;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Roles roles;
 
-    @Column(nullable = false)
-    private boolean enabled = false;
+    private boolean enable = false;
 
     @OneToMany(mappedBy = "author")
     private List<Blog> blogs;
@@ -53,4 +52,5 @@ public class User {
 
     @OneToMany(mappedBy = "friend",cascade = CascadeType.ALL)
     private List<Friend> sentFriends; // user received friend request
+
 }
