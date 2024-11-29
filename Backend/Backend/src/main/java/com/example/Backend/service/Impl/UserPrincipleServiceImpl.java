@@ -18,10 +18,10 @@ public class UserPrincipleServiceImpl implements UserPrincipleService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) {
+        User user = userRepository.findByEmail(email);
         if (Objects.isNull(user)) {
-            throw new UsernameNotFoundException("User Not Found with username: " + username);
+            throw new UsernameNotFoundException("User Not Found with email: " + email);
         }
         return new UserPrinciple(user);
     }

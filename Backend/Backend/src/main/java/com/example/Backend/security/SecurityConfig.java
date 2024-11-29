@@ -28,7 +28,7 @@ public class SecurityConfig {
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(r->r
-                        .requestMatchers("/api/auth/**",
+                        .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/v2/api-docs",
                                 "/v3/api-docs",
@@ -40,8 +40,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/webjars/**",
                                 "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/v1/user/**", "api/v1/post/**").hasAnyAuthority("USER", "ADMIN")
-                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("api/v1/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

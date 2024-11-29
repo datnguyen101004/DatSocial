@@ -1,5 +1,6 @@
 package com.example.Backend.security;
 
+import com.example.Backend.exception.CustomException.InvalidJwtTokenException;
 import com.example.Backend.service.JwtService;
 import com.example.Backend.service.UserPrincipleService;
 import jakarta.servlet.FilterChain;
@@ -34,17 +35,25 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         var jwt = authHeader.substring(7);
-        var username = jwtService.extractUsername(jwt);
-        if (username!=null){
-            UserDetails userDetails = userPrincipleService.loadUserByUsername(username);
-            if (jwtService.isTokenValid(jwt, userDetails) && SecurityContextHolder.getContext().getAuthentication() == null){
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                securityContext.setAuthentication(usernamePasswordAuthenticationToken);
-                SecurityContextHolder.setContext(securityContext);
+        try {
+            var username = jwtService.extractUsername(jwt);
+            if (username != null) {
+                UserDetails userDetails = userPrincipleService.loadUserByUsername(username);
+                if (jwtService.isTokenValid(jwt, userDetails) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    securityContext.setAuthentication(usernamePasswordAuthenticationToken);
+                    SecurityContextHolder.setContext(securityContext);
+                }
+            } else {
+                throw new InvalidJwtTokenException("Invalid JWT token");  // Nếu không tìm thấy username, ném ngoại lệ
             }
+        } catch (Exception e) {
+            throw new InvalidJwtTokenException("Invalid JWT token");  // Ném ngoại lệ khi có lỗi trong quá trình xử lý
         }
+
         filterChain.doFilter(request, response);
     }
 }

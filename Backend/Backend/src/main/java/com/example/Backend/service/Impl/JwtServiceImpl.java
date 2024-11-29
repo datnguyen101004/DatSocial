@@ -1,5 +1,6 @@
 package com.example.Backend.service.Impl;
 
+import com.example.Backend.exception.CustomException.InvalidJwtTokenException;
 import com.example.Backend.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -25,33 +26,33 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.expiredRefresh}")
     private String EXPIRED_REFRESH_TOKEN;
 
-    public String generateAccessToken(UserDetails userDetails) {
-        return generateAccessToken(new HashMap<>(), userDetails);
+    public String generateAccessToken(String email) {
+        return generateAccessToken(new HashMap<>(), email);
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        return generateRefreshToken(new HashMap<>(), userDetails);
+    public String generateRefreshToken(String email) {
+        return generateRefreshToken(new HashMap<>(), email);
     }
 
-    private String generateAccessToken(Map<String, Object> claims, UserDetails userDetails){
+    private String generateAccessToken(Map<String, Object> claims, String email){
         long expiredAccess = Long.parseLong(EXPIRED_ACCESS_TOKEN.substring(0, 1));
         return Jwts.builder()
                 .setClaims(claims)
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+ expiredAccess*60*60*1000))
-                .setSubject(userDetails.getUsername())
+                .setSubject(email)
                 .compact();
     }
 
-    private String generateRefreshToken(Map<String, Object> claims, UserDetails userDetails){
+    private String generateRefreshToken(Map<String, Object> claims, String email){
         long expiredRefresh = Long.parseLong(EXPIRED_REFRESH_TOKEN.substring(0, 1));
         return Jwts.builder()
                 .setClaims(claims)
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+ expiredRefresh*24*60*60*1000))
-                .setSubject(userDetails.getUsername())
+                .setSubject(email)
                 .compact();
     }
 
@@ -82,8 +83,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
-        String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try{
+            String username = extractUsername(token);
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception e){
+            throw new InvalidJwtTokenException("Invalid JWT token");
+        }
     }
 
     private boolean isTokenExpired(String token) {

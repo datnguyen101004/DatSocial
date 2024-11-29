@@ -1,17 +1,18 @@
 spring:
-  port: 8081
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
   datasource:
-    url: jdbc:mysql://localhost:3306/datsocial
+    url: jdbc:mysql://localhost:3306/datsocial?sessionVariables=sql_mode='NO_ENGINE_SUBSTITUTION'&jdbcCompliantTruncation=false
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jpa:
-      hibernate:
-          ddl-auto: update
-      show-sql: true
-      properties:
-          hibernate:
-              dialect: org.hibernate.dialect.MySQL5Dialect
+  main:
+    allow-circular-references: true
   mail:
     port: 587
     host: smtp.gmail.com
@@ -23,7 +24,6 @@ spring:
           auth: true
           starttls:
             enable: true
-
 jwt:
   secret-key: 'V2VsYzBtZV90MF9teV9ibDBnX3dlYnMxdGVfRGF0X2lzX0FkbTFu'
   expiredAccess: '6h'

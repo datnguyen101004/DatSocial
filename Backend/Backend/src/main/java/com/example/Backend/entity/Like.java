@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Table(
-    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "blog_id"})
+        name = "likes",  // Đổi tên bảng thành "likes"
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "blog_id"})
 )
 public class Like {
     @Id
