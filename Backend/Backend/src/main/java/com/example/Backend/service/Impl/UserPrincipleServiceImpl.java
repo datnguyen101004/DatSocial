@@ -19,7 +19,7 @@ public class UserPrincipleServiceImpl implements UserPrincipleService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email).get();
         if (Objects.isNull(user)) {
             throw new UsernameNotFoundException("User Not Found with email: " + email);
         }

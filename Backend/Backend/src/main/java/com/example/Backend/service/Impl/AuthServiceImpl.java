@@ -5,7 +5,7 @@ import com.example.Backend.dto.Request.RegisterDto;
 import com.example.Backend.dto.Response.TokenResponseDto;
 import com.example.Backend.entity.Enum.Roles;
 import com.example.Backend.entity.User;
-import com.example.Backend.exception.CustomException.EmailExistException;
+import com.example.Backend.exception.CustomException.EmailNotExistException;
 import com.example.Backend.exception.CustomException.InvalidCredentialException;
 import com.example.Backend.repository.UserRepository;
 import com.example.Backend.service.AuthService;
@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponseDto register(RegisterDto registerDto) {
         if (userRepository.existsByEmail(registerDto.getEmail())) {
-            throw new EmailExistException("Email is already in use");
+            throw new EmailNotExistException("Email is already in use");
         }
         User user = new User();
         user.setFullName(registerDto.getFullName());
@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
             );
-            User user = userRepository.findByEmail(loginDto.getEmail());
+            User user = userRepository.findByEmail(loginDto.getEmail()).get();
             String token = jwtService.generateAccessToken(user.getEmail());
             String refreshToken = jwtService.generateRefreshToken(user.getEmail());
             return new TokenResponseDto(token, refreshToken);

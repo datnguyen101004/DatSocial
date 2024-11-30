@@ -34,6 +34,8 @@ public class Blog {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
     private List<Like> likes;
 

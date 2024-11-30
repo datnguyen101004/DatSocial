@@ -1,7 +1,7 @@
 package com.example.Backend.exception;
 
 import com.example.Backend.dto.ResponseDto;
-import com.example.Backend.exception.CustomException.EmailExistException;
+import com.example.Backend.exception.CustomException.EmailNotExistException;
 import com.example.Backend.exception.CustomException.InvalidCredentialException;
 import com.example.Backend.exception.CustomException.InvalidJwtTokenException;
 import org.springframework.http.HttpStatus;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalException {
 
-    @ExceptionHandler(EmailExistException.class)
-    public ResponseEntity<ResponseDto<?>> emailExist(EmailExistException e) {
+    @ExceptionHandler(EmailNotExistException.class)
+    public ResponseEntity<ResponseDto<?>> emailExist(EmailNotExistException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ResponseDto.fail(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
