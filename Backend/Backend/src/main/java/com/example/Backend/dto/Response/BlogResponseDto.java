@@ -15,6 +15,9 @@ public class BlogResponseDto {
     private String title;
     private String content;
     private String author;
+    private int likesCount;
+    private int commentsCount;
+    private int sharesCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

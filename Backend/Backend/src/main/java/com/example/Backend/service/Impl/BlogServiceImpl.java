@@ -4,7 +4,6 @@ import com.example.Backend.dto.Request.CreateBlogDto;
 import com.example.Backend.dto.Response.BlogResponseDto;
 import com.example.Backend.entity.Blog;
 import com.example.Backend.entity.User;
-import com.example.Backend.exception.CustomException.EmailNotExistException;
 import com.example.Backend.exception.CustomException.NotFoundException;
 import com.example.Backend.exception.CustomException.UnauthorizedException;
 import com.example.Backend.mapper.BlogMapper;
@@ -29,7 +28,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogResponseDto createBlog(CreateBlogDto createBlogDto, String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EmailNotExistException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
         Blog blog = Blog.builder()
                 .title(createBlogDto.getTitle())
                 .content(createBlogDto.getContent())
@@ -37,13 +36,21 @@ public class BlogServiceImpl implements BlogService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         blogRepository.save(blog);
-        return blogMapper.toBlogResponseDto(blog);
+        BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
+        blogResponseDto.setLikesCount(0);
+        blogResponseDto.setCommentsCount(0);
+        blogResponseDto.setSharesCount(0);
+        return blogResponseDto;
     }
 
     @Override
     public BlogResponseDto getBlogById(Long id) {
         Blog blog = blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog not found"));
-        return blogMapper.toBlogResponseDto(blog);
+        BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
+        blogResponseDto.setLikesCount(blog.getLikes().size());
+        blogResponseDto.setCommentsCount(blog.getComments().size());
+        blogResponseDto.setSharesCount(blog.getShares().size());
+        return blogResponseDto;
     }
 
     @Override
@@ -51,7 +58,11 @@ public class BlogServiceImpl implements BlogService {
         List<Blog> blogs = blogRepository.findAll();
         List<BlogResponseDto> blogResponseDtos = new ArrayList<>();
         for (Blog blog : blogs) {
-            blogResponseDtos.add(blogMapper.toBlogResponseDto(blog));
+            BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
+            blogResponseDto.setLikesCount(blog.getLikes().size());
+            blogResponseDto.setCommentsCount(blog.getComments().size());
+            blogResponseDto.setSharesCount(blog.getShares().size());
+            blogResponseDtos.add(blogResponseDto);
         }
         return blogResponseDtos;
     }
@@ -78,7 +89,11 @@ public class BlogServiceImpl implements BlogService {
             blog.setTitle(createBlogDto.getTitle());
             blog.setContent(createBlogDto.getContent());
             blogRepository.save(blog);
-            return blogMapper.toBlogResponseDto(blog);
+            BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
+            blogResponseDto.setLikesCount(blog.getLikes().size());
+            blogResponseDto.setCommentsCount(blog.getComments().size());
+            blogResponseDto.setSharesCount(blog.getShares().size());
+            return blogResponseDto;
         }
         else {
             throw new UnauthorizedException("You are not allowed to edit this blog");
