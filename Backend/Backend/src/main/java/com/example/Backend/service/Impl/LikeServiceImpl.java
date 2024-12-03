@@ -49,7 +49,7 @@ public class LikeServiceImpl implements LikeService {
         if (type.equalsIgnoreCase("blog")) {
             Blog blog = blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog not found"));
             User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
-            Like like = likeRepository.findByBlogAndUser(blog, user).orElseThrow(() -> new NotFoundException("Like not found"));
+            Like like = likeRepository.findByBlogAndUser(blog, user).orElseThrow(() -> new NotFoundException("You not liked"));
             likeRepository.delete(like);
             return LikeResponse.builder()
                     .type("blog")

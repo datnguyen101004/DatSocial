@@ -26,5 +26,5 @@ spring:
             enable: true
 jwt:
   secret-key: 'V2VsYzBtZV90MF9teV9ibDBnX3dlYnMxdGVfRGF0X2lzX0FkbTFu'
-  expiredAccess: '6h'
-  expiredRefresh: '3d'
+  expiredAccess: '3h'
+  expiredRefresh: '1d'

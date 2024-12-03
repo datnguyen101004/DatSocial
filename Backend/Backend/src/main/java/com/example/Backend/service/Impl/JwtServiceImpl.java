@@ -91,7 +91,7 @@ public class JwtServiceImpl implements JwtService {
         }
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiredTime(token).before(new Date(System.currentTimeMillis()));
     }
 }

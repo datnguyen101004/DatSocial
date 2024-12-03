@@ -5,7 +5,7 @@ import com.example.Backend.dto.Response.BlogResponseDto;
 import com.example.Backend.entity.Blog;
 import com.example.Backend.entity.User;
 import com.example.Backend.exception.CustomException.NotFoundException;
-import com.example.Backend.exception.CustomException.UnauthorizedException;
+import com.example.Backend.exception.CustomException.NotPermissionException;
 import com.example.Backend.mapper.BlogMapper;
 import com.example.Backend.repository.BlogRepository;
 import com.example.Backend.repository.UserRepository;
@@ -77,7 +77,7 @@ public class BlogServiceImpl implements BlogService {
             return "Delete blog successfully";
         }
         else {
-            throw new UnauthorizedException("You are not allowed to delete this blog");
+            throw new NotPermissionException("You are not allowed to delete this blog");
         }
     }
 
@@ -96,7 +96,7 @@ public class BlogServiceImpl implements BlogService {
             return blogResponseDto;
         }
         else {
-            throw new UnauthorizedException("You are not allowed to edit this blog");
+            throw new NotPermissionException("You are not allowed to edit this blog");
         }
     }
 }

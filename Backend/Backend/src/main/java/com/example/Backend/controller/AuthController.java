@@ -1,12 +1,12 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.Request.LoginDto;
+import com.example.Backend.dto.Request.RefreshTokenDto;
 import com.example.Backend.dto.Request.RegisterDto;
 import com.example.Backend.dto.Response.TokenResponseDto;
 import com.example.Backend.dto.ResponseDto;
 import com.example.Backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,5 +25,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseDto<TokenResponseDto> login(@RequestBody LoginDto loginDto) {
         return ResponseDto.success(authService.login(loginDto));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseDto<TokenResponseDto> refresh(@RequestBody RefreshTokenDto refreshToken) {
+        return ResponseDto.success(authService.refresh(refreshToken));
     }
 }

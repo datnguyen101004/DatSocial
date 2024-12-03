@@ -1,6 +1,7 @@
 package com.example.Backend.service.Impl;
 
 import com.example.Backend.dto.Request.LoginDto;
+import com.example.Backend.dto.Request.RefreshTokenDto;
 import com.example.Backend.dto.Request.RegisterDto;
 import com.example.Backend.dto.Response.TokenResponseDto;
 import com.example.Backend.entity.Enum.Roles;
@@ -13,6 +14,7 @@ import com.example.Backend.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,24 @@ public class AuthServiceImpl implements AuthService {
             return new TokenResponseDto(token, refreshToken);
         } catch (Exception e) {
             throw new InvalidCredentialException("Invalid email or password");
+        }
+    }
+
+    @Override
+    public TokenResponseDto refresh(RefreshTokenDto refreshToken) {
+        String email = jwtService.extractUsername(refreshToken.getRefreshToken());
+        if (email != null) {
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+            if (!jwtService.isTokenExpired(refreshToken.getRefreshToken())) {
+                String token = jwtService.generateAccessToken(email);
+                return new TokenResponseDto(token, refreshToken.getRefreshToken());
+            }
+            else {
+                throw new InvalidCredentialException("Invalid refresh token");
+            }
+        }
+        else {
+            throw new NotFoundException("User not found");
         }
     }
 }
