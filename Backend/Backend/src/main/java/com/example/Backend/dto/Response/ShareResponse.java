@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LikeResponse {
-    private Long id;
-    private String type;
-    private boolean liked;
+public class ShareResponse {
+    private String message;
+    private BlogResponseDto blogResponseDto;
+    private String displayZone;
 }

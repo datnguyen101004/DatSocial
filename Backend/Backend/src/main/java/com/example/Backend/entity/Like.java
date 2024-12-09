@@ -34,4 +34,6 @@ public class Like {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private boolean liked = false;
 }

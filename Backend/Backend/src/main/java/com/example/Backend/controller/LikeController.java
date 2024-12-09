@@ -9,19 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/like")
 public class LikeController {
 
     private final LikeService likeService;
 
-    @PostMapping("/{content-type}/{content-id}/like")
-    public ResponseDto<LikeResponse> likeBlog(@PathVariable("content-type") String type, @PathVariable("content-id") Long id, Authentication authentication) {
-        return ResponseDto.success(likeService.likeBlog(type, id, authentication.getName()));
-    }
-
-    @PostMapping("/{content-type}/{content-id}/unlike")
-    public ResponseDto<LikeResponse> unlikeBlog(@PathVariable("content-type") String type, @PathVariable("content-id") Long id, Authentication authentication) {
-        return ResponseDto.success(likeService.unlikeBlog(type, id, authentication.getName()));
+    @PostMapping("/{content-type}/{content-id}/")
+    public ResponseDto<String> like(@PathVariable("content-type") String type, @PathVariable("content-id") Long id, Authentication authentication) {
+        return ResponseDto.success(likeService.like(type, id, authentication.getName()));
     }
 
     @GetMapping("/{content-type}/{content-id}/isLiked")

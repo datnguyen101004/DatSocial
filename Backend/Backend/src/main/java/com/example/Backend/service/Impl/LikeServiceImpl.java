@@ -13,6 +13,9 @@ import com.example.Backend.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LikeServiceImpl implements LikeService {
@@ -21,42 +24,32 @@ public class LikeServiceImpl implements LikeService {
     private final UserRepository userRepository;
 
     @Override
-    public LikeResponse likeBlog(String type, Long id, String email) {
+    public String like(String type, Long id, String email) {
         //type : blog, avatar, comment, ...
         if (type.equalsIgnoreCase("blog")) {
             Blog blog = blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog not found"));
             User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
-            if (likeRepository.existsByBlogAndUser(blog, user)) {
-                throw new AlreadyException("Already liked");
+            Optional<Like> like = likeRepository.findByBlogAndUser(blog, user);
+            if (like.isPresent()) {
+                if (like.get().isLiked()){
+                    like.get().setLiked(false);
+                    likeRepository.save(like.get());
+                    return "Unlike";
+                }
+                else {
+                    like.get().setLiked(true);
+                    likeRepository.save(like.get());
+                    return "Like";
+                }
             }
-            Like like = Like.builder()
-                    .blog(blog)
-                    .user(user)
-                    .build();
-            likeRepository.save(like);
-            return LikeResponse.builder()
-                    .type("blog")
-                    .id(blog.getId())
-                    .fullName(user.getFullName())
-                    .liked(true)
-                    .build();
-        }
-        throw new NotFoundException("Type not found");
-    }
-
-    @Override
-    public LikeResponse unlikeBlog(String type, Long id, String email) {
-        if (type.equalsIgnoreCase("blog")) {
-            Blog blog = blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog not found"));
-            User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
-            Like like = likeRepository.findByBlogAndUser(blog, user).orElseThrow(() -> new NotFoundException("You not liked"));
-            likeRepository.delete(like);
-            return LikeResponse.builder()
-                    .type("blog")
-                    .id(blog.getId())
-                    .fullName(user.getFullName())
-                    .liked(false)
-                    .build();
+            else {
+                Like like1 = Like.builder()
+                        .blog(blog)
+                        .user(user)
+                        .build();
+                likeRepository.save(like1);
+                return "Like";
+            }
         }
         throw new NotFoundException("Type not found");
     }

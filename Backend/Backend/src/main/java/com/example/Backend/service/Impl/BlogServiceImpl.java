@@ -33,24 +33,15 @@ public class BlogServiceImpl implements BlogService {
                 .title(createBlogDto.getTitle())
                 .content(createBlogDto.getContent())
                 .author(user)
-                .updatedAt(LocalDateTime.now())
                 .build();
         blogRepository.save(blog);
-        BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
-        blogResponseDto.setLikesCount(0);
-        blogResponseDto.setCommentsCount(0);
-        blogResponseDto.setSharesCount(0);
-        return blogResponseDto;
+        return blogMapper.toBlogResponseDto(blog);
     }
 
     @Override
     public BlogResponseDto getBlogById(Long id) {
         Blog blog = blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog not found"));
-        BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
-        blogResponseDto.setLikesCount(blog.getLikes().size());
-        blogResponseDto.setCommentsCount(blog.getComments().size());
-        blogResponseDto.setSharesCount(blog.getShares().size());
-        return blogResponseDto;
+        return blogMapper.toBlogResponseDto(blog);
     }
 
     @Override
@@ -59,9 +50,6 @@ public class BlogServiceImpl implements BlogService {
         List<BlogResponseDto> blogResponseDtos = new ArrayList<>();
         for (Blog blog : blogs) {
             BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
-            blogResponseDto.setLikesCount(blog.getLikes().size());
-            blogResponseDto.setCommentsCount(blog.getComments().size());
-            blogResponseDto.setSharesCount(blog.getShares().size());
             blogResponseDtos.add(blogResponseDto);
         }
         return blogResponseDtos;
@@ -88,12 +76,9 @@ public class BlogServiceImpl implements BlogService {
         if (blog.getAuthor().getEmail().equals(user.getEmail())) {
             blog.setTitle(createBlogDto.getTitle());
             blog.setContent(createBlogDto.getContent());
+            blog.setUpdatedAt(LocalDateTime.now());
             blogRepository.save(blog);
-            BlogResponseDto blogResponseDto = blogMapper.toBlogResponseDto(blog);
-            blogResponseDto.setLikesCount(blog.getLikes().size());
-            blogResponseDto.setCommentsCount(blog.getComments().size());
-            blogResponseDto.setSharesCount(blog.getShares().size());
-            return blogResponseDto;
+            return blogMapper.toBlogResponseDto(blog);
         }
         else {
             throw new NotPermissionException("You are not allowed to edit this blog");

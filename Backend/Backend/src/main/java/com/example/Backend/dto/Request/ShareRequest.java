@@ -1,4 +1,4 @@
-package com.example.Backend.dto.Response;
+package com.example.Backend.dto.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LikeResponse {
-    private Long id;
-    private String type;
-    private boolean liked;
+public class ShareRequest {
+    private String message;
+    private String displayZone;
 }

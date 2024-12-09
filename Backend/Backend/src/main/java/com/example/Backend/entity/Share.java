@@ -1,5 +1,6 @@
 package com.example.Backend.entity;
 
+import com.example.Backend.entity.Enum.DisplayZone;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,11 @@ public class Share {
     @JoinColumn(name = "blog_id",
             referencedColumnName = "id")
     private Blog blog;
+
+    @Enumerated(EnumType.STRING)
+    private DisplayZone displayZone;
+
+    private String message;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

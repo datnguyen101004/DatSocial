@@ -34,6 +34,7 @@ public class Blog {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @CreationTimestamp
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)

@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LikeResponse {
-    private Long id;
-    private String type;
-    private boolean liked;
+public class UserResponse {
+    private String fullName;
+    private List<BlogResponseDto> myBlog;
 }
