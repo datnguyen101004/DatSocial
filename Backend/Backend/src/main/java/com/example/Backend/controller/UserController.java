@@ -33,4 +33,8 @@ public class UserController {
         return ResponseDto.success(userService.profileLike(authentication.getName()));
     }
 
+    @GetMapping("/profile/friend/request")
+    public ResponseDto<UserResponse> profileFriendRequest(Authentication authentication) {
+        return ResponseDto.success(userService.profileFriendRequest(authentication.getName()));
+    }
 }

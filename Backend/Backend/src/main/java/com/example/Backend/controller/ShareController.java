@@ -18,4 +18,9 @@ public class ShareController {
     public ResponseDto<String> shareBlog(@PathVariable("blog-id") Long blogId, @RequestBody ShareRequest shareRequest, Authentication authentication) {
         return ResponseDto.success(shareService.shareBlog(blogId, shareRequest, authentication.getName()));
     }
+
+    @PostMapping("/{blog-id}/delete")
+    public ResponseDto<String> deleteShare(@PathVariable("blog-id") Long blogId, Authentication authentication) {
+        return ResponseDto.success(shareService.deleteShare(blogId, authentication.getName()));
+    }
 }

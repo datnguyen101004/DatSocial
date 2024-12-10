@@ -1,10 +1,14 @@
 package com.example.Backend.entity;
 
+import com.example.Backend.entity.Enum.FriendStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -26,5 +30,9 @@ public class Friend {
             referencedColumnName = "id")
     private User friend;
 
-    private String status; // pending, accepted, rejected, blocked, follow
+    @Enumerated(EnumType.STRING)
+    private FriendStatus status;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }

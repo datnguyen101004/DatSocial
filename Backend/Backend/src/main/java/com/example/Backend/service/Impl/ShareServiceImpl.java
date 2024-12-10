@@ -44,4 +44,13 @@ public class ShareServiceImpl implements ShareService {
             throw new NotFoundException("Display zone not found");
         }
     }
+
+    @Override
+    public String deleteShare(Long blogId, String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new NotFoundException("Blog not found"));
+        Share share = shareRepository.findByBlogAndUser(blog, user).orElseThrow(() -> new NotFoundException("Share not found"));
+        shareRepository.delete(share);
+        return "Delete share successfully";
+    }
 }
