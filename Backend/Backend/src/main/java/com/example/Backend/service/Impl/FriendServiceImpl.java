@@ -4,6 +4,7 @@ import com.example.Backend.dto.Response.FriendResponse;
 import com.example.Backend.entity.Enum.FriendStatus;
 import com.example.Backend.entity.Friend;
 import com.example.Backend.entity.User;
+import com.example.Backend.exception.CustomException.AlreadyException;
 import com.example.Backend.exception.CustomException.NotFoundException;
 import com.example.Backend.mapper.FriendMapper;
 import com.example.Backend.repository.FriendRepository;
@@ -12,6 +13,7 @@ import com.example.Backend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -25,13 +27,30 @@ public class FriendServiceImpl implements FriendService {
     public FriendResponse sendRequest(Long friendId, String name) {
         User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
         User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
-        if (friendRepository.findByUserAndFriend(user, friend).isPresent()) {
-            throw new NotFoundException("You have sent request to this user");
+        Optional<Friend> friend2 = friendRepository.findByUserAndFriend(user, friend);
+        if (friend2.isPresent()) {
+            if (friend2.get().getStatus().equals(FriendStatus.valueOf("PENDING"))) {
+                friend2.get().setStatus(FriendStatus.NONE);
+                friendRepository.save(friend2.get());
+                return friendMapper.toFriendResponse(friend2.get());
+            }
+            if (friend2.get().getStatus().equals(FriendStatus.valueOf("BLOCKED"))) {
+                throw new AlreadyException("You are blocked by this user");
+            }
+            if (friend2.get().getStatus().equals(FriendStatus.valueOf("ACCEPTED"))) {
+                throw new AlreadyException("You are already friend with this user");
+            }
+            if (friend2.get().getStatus().equals(FriendStatus.valueOf("NONE"))) {
+                friend2.get().setStatus(FriendStatus.PENDING);
+                friendRepository.save(friend2.get());
+                return friendMapper.toFriendResponse(friend2.get());
+            }
         }
         Friend friend1 = Friend.builder()
                 .user(user)
                 .friend(friend)
                 .status(FriendStatus.PENDING)
+                .createdAt(LocalDateTime.now())
                 .build();
         friendRepository.save(friend1);
         return friendMapper.toFriendResponse(friend1);
@@ -43,6 +62,9 @@ public class FriendServiceImpl implements FriendService {
         User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
         if (friendRepository.findByUserAndFriend(friend, user).isEmpty()) {
             throw new NotFoundException("You have not received request from this user");
+        }
+        if (friendRepository.findByUserAndFriendAndStatus(friend, user, FriendStatus.valueOf("PENDING")).isEmpty()) {
+            throw new NotFoundException("You are already friend with this user");
         }
         Friend friend1 = friendRepository.findByUserAndFriend(friend, user).get();
         friend1.setStatus(FriendStatus.ACCEPTED);
@@ -57,8 +79,11 @@ public class FriendServiceImpl implements FriendService {
         if (friendRepository.findByUserAndFriend(friend, user).isEmpty()) {
             throw new NotFoundException("You have not received request from this user");
         }
+        if (friendRepository.findByUserAndFriendAndStatus(friend, user, FriendStatus.valueOf("PENDING")).isEmpty()) {
+            throw new NotFoundException("You are not friend with this user");
+        }
         Friend friend1 = friendRepository.findByUserAndFriend(friend, user).get();
-        friend1.setStatus(FriendStatus.REJECTED);
+        friend1.setStatus(FriendStatus.NONE);
         friendRepository.save(friend1);
         return friendMapper.toFriendResponse(friend1);
     }
@@ -67,11 +92,12 @@ public class FriendServiceImpl implements FriendService {
     public FriendResponse unFriend(Long friendId, String name) {
         User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
         User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
-        Optional<Friend> friend1 = friendRepository.findByUserAndFriend(user, friend);
+        Optional<Friend> friend1 = friendRepository.findByUserAndFriendAndStatus(user, friend, FriendStatus.valueOf("ACCEPTED"));
         if (friend1.isEmpty()) {
             throw new NotFoundException("You have not been friend with this user");
         }
-        friendRepository.delete(friend1.get());
+        friend1.get().setStatus(FriendStatus.NONE);
+        friendRepository.save(friend1.get());
         return friendMapper.toFriendResponse(friend1.get());
     }
 
@@ -79,12 +105,12 @@ public class FriendServiceImpl implements FriendService {
     public FriendResponse blockFriend(Long friendId, String name) {
         User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
         User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
-        Optional<Friend> friend1 = friendRepository.findByUserAndFriend(user, friend);
-        if (friend1.isEmpty()) {
-            throw new NotFoundException("You have not been friend with this user");
-        }
-        friend1.get().setStatus(FriendStatus.BLOCKED);
-        friendRepository.save(friend1.get());
-        return friendMapper.toFriendResponse(friend1.get());
+        Friend friend1 = Friend.builder()
+                .user(user)
+                .friend(friend)
+                .status(FriendStatus.BLOCKED)
+                .createdAt(LocalDateTime.now())
+                .build();
+        return friendMapper.toFriendResponse(friend1);
     }
 }

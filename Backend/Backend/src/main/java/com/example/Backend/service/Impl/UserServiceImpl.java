@@ -1,11 +1,19 @@
 package com.example.Backend.service.Impl;
 
+import com.example.Backend.dto.Response.FriendListResponse;
+import com.example.Backend.dto.Response.FriendResponse;
+import com.example.Backend.dto.Response.SearchUserResponse;
 import com.example.Backend.dto.Response.UserResponse;
+import com.example.Backend.entity.Enum.FriendStatus;
+import com.example.Backend.entity.Friend;
 import com.example.Backend.entity.Like;
 import com.example.Backend.entity.Share;
 import com.example.Backend.entity.User;
 import com.example.Backend.exception.CustomException.NotFoundException;
 import com.example.Backend.mapper.BlogMapper;
+import com.example.Backend.mapper.FriendMapper;
+import com.example.Backend.mapper.UserMapper;
+import com.example.Backend.repository.FriendRepository;
 import com.example.Backend.repository.UserRepository;
 import com.example.Backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +27,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BlogMapper blogMapper;
+    private final FriendRepository friendRepository;
+    private final FriendMapper friendMapper;
+    private final UserMapper userMapper;
 
     @Override
     public UserResponse profile(String name) {
@@ -49,5 +60,26 @@ public class UserServiceImpl implements UserService {
                 .fullName(user.getFullName())
                 .myBlog(likes.stream().map(like -> blogMapper.toBlogResponseDto(like.getBlog())).collect(Collectors.toList()))
                 .build();
+    }
+
+    @Override
+    public List<FriendResponse> getAllFriendRequest(String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(()->new NotFoundException("User not found"));
+        List<Friend> friends = friendRepository.findByFriendAndStatus(user, FriendStatus.valueOf("PENDING"));
+        return friends.stream().map(friendMapper::toFriendResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FriendListResponse> getAllFriend(String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(()->new NotFoundException("User not found"));
+        List<Friend> friends = friendRepository.findByUserAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
+        return friends.stream().map(friendMapper::toFriendListResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchUserResponse> searchUser(String name, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(()->new NotFoundException("User not found"));
+        List<User> users = userRepository.findByFullNameContainingIgnoreCase(name);
+        return users.stream().map(userMapper::toSearchUserResponse).collect(Collectors.toList());
     }
 }
