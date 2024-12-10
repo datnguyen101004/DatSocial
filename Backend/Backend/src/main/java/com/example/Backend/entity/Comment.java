@@ -38,4 +38,7 @@ public class Comment {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private LocalDateTime updatedAt;
 }

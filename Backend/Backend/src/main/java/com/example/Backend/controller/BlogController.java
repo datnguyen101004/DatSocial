@@ -2,6 +2,7 @@ package com.example.Backend.controller;
 
 import com.example.Backend.dto.Request.CreateBlogDto;
 import com.example.Backend.dto.Response.BlogResponseDto;
+import com.example.Backend.dto.Response.CommentResponse;
 import com.example.Backend.dto.ResponseDto;
 import com.example.Backend.service.BlogService;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,10 @@ public class BlogController {
     @PostMapping("/edit/{id}")
     public ResponseDto<BlogResponseDto> editBlog(@PathVariable Long id, @RequestBody CreateBlogDto createBlogDto, Authentication authentication) {
         return ResponseDto.success(blogService.editBlog(id, createBlogDto, authentication.getName()));
+    }
+
+    @GetMapping("/{id}/comment")
+    public ResponseDto<List<CommentResponse>> getAllComments(@PathVariable Long id) {
+        return ResponseDto.success(blogService.getAllComments(id));
     }
 }

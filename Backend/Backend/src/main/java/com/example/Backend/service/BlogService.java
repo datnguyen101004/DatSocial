@@ -2,6 +2,7 @@ package com.example.Backend.service;
 
 import com.example.Backend.dto.Request.CreateBlogDto;
 import com.example.Backend.dto.Response.BlogResponseDto;
+import com.example.Backend.dto.Response.CommentResponse;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface BlogService {
     String deleteBlog(Long id, String name);
 
     BlogResponseDto editBlog(Long id, CreateBlogDto createBlogDto, String name);
+
+    List<CommentResponse> getAllComments(Long id);
 }

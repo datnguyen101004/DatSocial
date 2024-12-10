@@ -2,11 +2,13 @@ package com.example.Backend.service.Impl;
 
 import com.example.Backend.dto.Request.CreateBlogDto;
 import com.example.Backend.dto.Response.BlogResponseDto;
+import com.example.Backend.dto.Response.CommentResponse;
 import com.example.Backend.entity.Blog;
 import com.example.Backend.entity.User;
 import com.example.Backend.exception.CustomException.NotFoundException;
 import com.example.Backend.exception.CustomException.NotPermissionException;
 import com.example.Backend.mapper.BlogMapper;
+import com.example.Backend.mapper.CommentMapper;
 import com.example.Backend.repository.BlogRepository;
 import com.example.Backend.repository.UserRepository;
 import com.example.Backend.service.BlogService;
@@ -25,6 +27,7 @@ public class BlogServiceImpl implements BlogService {
     private final BlogRepository blogRepository;
     private final UserRepository userRepository;
     private final BlogMapper blogMapper;
+    private final CommentMapper commentMapper;
 
     @Override
     public BlogResponseDto createBlog(CreateBlogDto createBlogDto, String email) {
@@ -83,5 +86,11 @@ public class BlogServiceImpl implements BlogService {
         else {
             throw new NotPermissionException("You are not allowed to edit this blog");
         }
+    }
+
+    @Override
+    public List<CommentResponse> getAllComments(Long id) {
+        Blog blog = blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog not found"));
+        return blog.getComments().stream().map(commentMapper::toCommentResponse).toList();
     }
 }
