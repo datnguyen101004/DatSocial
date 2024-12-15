@@ -1,7 +1,14 @@
 import "./App.css";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
-  return <div className="App"></div>;
+  return (
+    <div className="App">
+      <Login />
+    </div>
+  );
 }
 
 export default App;
