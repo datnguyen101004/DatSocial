@@ -1,4 +1,6 @@
-/* Tổng thể cho container */
+/* Login.css */
+
+/* Tổng thể giao diện */
 .Login-container {
   max-width: 400px;
   margin: 50px auto;
@@ -10,71 +12,92 @@
   font-family: Arial, sans-serif;
 }
 
-/* Tiêu đề */
 .Login-container h2 {
   text-align: center;
   margin-bottom: 20px;
   color: #333;
 }
 
-/* Form tổng thể */
+/* Định dạng lỗi */
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Form styles */
 .Login-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* Nhóm form (label và input) */
 .form-group {
   display: flex;
   flex-direction: column;
 }
 
-/* Label */
-.form-group label {
+label {
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 5px;
   color: #555;
 }
 
-/* Input */
-.form-group input {
+input {
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-.form-group input:focus {
-  border-color: #007bff;
   outline: none;
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.25);
+  transition: border-color 0.3s;
 }
 
-/* Nút đăng nhập */
-.login-button {
-  padding: 10px;
+input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+/* Button styles */
+button {
+  padding: 10px 15px;
   font-size: 16px;
   font-weight: bold;
-  color: #fff;
-  background-color: #007bff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  text-align: center;
-  margin-left: 100px;
-  margin-top: 20px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.login-button {
+  background-color: #007bff;
+  color: white;
 }
 
 .login-button:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
 }
 
-/* Lỗi */
-.error {
-  color: red;
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 10px;
+.signup-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.signup-button:hover {
+  background-color: #1e7e34;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .Login-container {
+    padding: 15px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
 }
