@@ -24,7 +24,7 @@ const Home = () => {
         setLoading(false);
       })
       .catch((error) => {
-        setError("Lỗi khi tải bài viết. Vui lòng thử lại!"); // Xử lý lỗi
+        setError("Hãy đăng nhập để xem các bài viết."); // Xử lý lỗi
         setLoading(false);
         console.error("Error:", error);
       });
@@ -43,7 +43,6 @@ const Home = () => {
   // Hiển thị danh sách bài viết
   return (
     <div className="home-container">
-      <h1>Danh sách bài viết</h1>
       <div className="posts">
         {posts.map((post) => (
           <div key={post.id} className="post">
