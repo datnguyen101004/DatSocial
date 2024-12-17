@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = "DatSocial", version = "v1.0.0", description = "Rest api for my blog project"),
+        info = @Info(title = "DatSocial", version = "v1.0.0", description = "Rest api for my social project"),
         servers = {
                 @Server(
                         description = "Local env",

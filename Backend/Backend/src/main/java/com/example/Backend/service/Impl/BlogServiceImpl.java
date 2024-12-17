@@ -36,6 +36,9 @@ public class BlogServiceImpl implements BlogService {
                 .title(createBlogDto.getTitle())
                 .content(createBlogDto.getContent())
                 .author(user)
+                .likes(new ArrayList<>())
+                .comments(new ArrayList<>())
+                .shares(new ArrayList<>())
                 .build();
         blogRepository.save(blog);
         return blogMapper.toBlogResponseDto(blog);

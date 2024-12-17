@@ -18,6 +18,9 @@ public interface BlogMapper {
 
     default int countLikes(Blog blog) {
         int count = 0;
+        if (blog.getLikes() == null) {
+            return count;
+        }
         List<Like> likes = blog.getLikes();
         for (Like like : likes) {
             if (like.isLiked()) {
