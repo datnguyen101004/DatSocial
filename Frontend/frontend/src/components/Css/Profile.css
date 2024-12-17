@@ -1,0 +1,103 @@
+.profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  h1, h2, h3 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .error-message {
+    color: red;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+  
+  .blog-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .blog-item {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .blog-item h4 {
+    margin: 0;
+    color: #007BFF;
+  }
+  
+  .blog-item p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  .blog-stats span {
+    display: inline-block;
+    margin-right: 1rem;
+    color: #666;
+  }
+  
+  small {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #888;
+  }
+
+  .blog-actions {
+    margin-top: 10px;
+  }
+  
+  .blog-actions button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .blog-actions button:hover {
+    background-color: #0056b3;
+  }
+  
+  .blog-actions button:nth-child(2) {
+    background-color: #dc3545;
+  }
+  
+  .blog-actions button:nth-child(2):hover {
+    background-color: #c82333;
+  }
+  
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .edit-form input,
+  .edit-form textarea {
+    margin: 5px 0;
+    padding: 8px;
+    font-size: 1rem;
+  }
+  
+  .edit-form button {
+    margin: 5px 5px 0 0;
+    padding: 6px 10px;
+  }
+  
+  

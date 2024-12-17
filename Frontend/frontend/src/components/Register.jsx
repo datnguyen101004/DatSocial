@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import "./Css/SignUp.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   // State để lưu thông tin người dùng
@@ -11,6 +12,8 @@ const SignUp = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const navigate = useNavigate();
 
   const api = "http://localhost:8080/api/v1/auth/register";
 
@@ -110,7 +113,7 @@ const SignUp = () => {
         <button type="submit" className="signup-button">
           Sign Up
         </button>
-        <button type="submit" className="login-button">
+        <button type="button" className="login-button" onClick={()=>{navigate("/login")}}>
           Log in
         </button>
       </form>

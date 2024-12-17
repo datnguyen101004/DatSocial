@@ -1,6 +1,7 @@
 // Import các thư viện cần thiết
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Để điều hướng
 import "./Css/Login.css";
 
 const Login = () => {
@@ -10,9 +11,11 @@ const Login = () => {
     password: "",
   });
 
-  const api = "http://localhost:8080/api/v1/auth/login";
-
   const [error, setError] = useState(""); // Lưu lỗi nếu có
+  const [message, setMessage] = useState(""); // Lưu message từ API
+
+  const navigate = useNavigate();
+  const api = "http://localhost:8080/api/v1/auth/login";
 
   // Xử lý khi người dùng nhập thông tin
   const handleChange = (e) => {
@@ -23,28 +26,41 @@ const Login = () => {
   // Xử lý khi form được submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
+    setMessage("");
 
     try {
       const result = await axios.post(api, formData);
-      console.log(result.data);
-      if (result.status === 200) {
-        alert("login successful!");
+
+      const { status, message, data } = result.data;
+
+      if (status === 200) {
+        // Đăng nhập thành công
+        localStorage.setItem("jwtToken", data.token);
+        localStorage.setItem("refreshToken", data.refreshToken);
+
+        setMessage(message); // Hiển thị thông báo từ server
+        alert("Login successful!");
+        navigate("/home"); // Điều hướng đến trang chính
       } else {
-        alert("Login failed!");
+        // Nếu status khác 0
+        setError(message || "Login failed. Please try again.");
       }
     } catch (error) {
-      if (error.response && error.response.status === 409) {
-        // Xử lý khi trạng thái HTTP là 409
-        alert("This account not exists. Please try another.");
+      if (error.response) {
+        // Lỗi từ phía server
+        setError(error.response.data.message || "An error occurred.");
       } else {
-        // Xử lý các lỗi khác
-        alert("An error occurred. Please try again later.");
-        console.error("Error details:", error);
+        // Lỗi khác (ví dụ: network)
+        setError("Unable to connect to the server. Please try again later.");
       }
     }
   };
+
+  const handleBtnRegister = (e)=>{
+    e.preventDefault();
+    navigate("/register");
+  }
 
   return (
     <div className="Login-container">
@@ -76,6 +92,9 @@ const Login = () => {
         </div>
         <button type="submit" className="login-button">
           Log in
+        </button>
+        <button type="button" className="signup-button" onClick={handleBtnRegister}>
+          Sign Up
         </button>
       </form>
     </div>
