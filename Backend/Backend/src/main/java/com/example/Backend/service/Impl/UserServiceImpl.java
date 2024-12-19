@@ -73,6 +73,8 @@ public class UserServiceImpl implements UserService {
     public List<FriendListResponse> getAllFriend(String name) {
         User user = userRepository.findByEmail(name).orElseThrow(()->new NotFoundException("User not found"));
         List<Friend> friends = friendRepository.findByUserAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
+        List<Friend> friends1 = friendRepository.findByFriendAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
+        friends.addAll(friends1);
         return friends.stream().map(friendMapper::toFriendListResponse).collect(Collectors.toList());
     }
 

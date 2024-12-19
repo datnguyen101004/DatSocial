@@ -46,6 +46,7 @@ public class LikeServiceImpl implements LikeService {
                 Like like1 = Like.builder()
                         .blog(blog)
                         .user(user)
+                        .liked(true)
                         .build();
                 likeRepository.save(like1);
                 return "Like";
