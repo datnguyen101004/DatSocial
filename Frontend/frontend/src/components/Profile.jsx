@@ -4,21 +4,22 @@ import "./Css/Profile.css";
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
+  const [friendsData, setFriendsData] = useState([]); // Dữ liệu bạn bè
+  const [likedBlogs, setLikedBlogs] = useState([]); // Dữ liệu bài viết đã thích
+  const [sharedBlogs, setSharedBlogs] = useState([]); // Dữ liệu bài viết đã chia sẻ
   const [error, setError] = useState("");
-  const [editingBlog, setEditingBlog] = useState(null); // Trạng thái chỉnh sửa
-  const [editForm, setEditForm] = useState({ title: "", content: "" });
-  const token = localStorage.getItem('jwtToken');
+  const [activeTab, setActiveTab] = useState("bai-viet"); // Tab mặc định
+
+  const token = localStorage.getItem("jwtToken");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/v1/user/profile",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
-            }
-        ); // API URL
+        const response = await axios.get("http://localhost:8080/api/v1/user/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data.status === 200) {
           setProfileData(response.data.data);
         } else {
@@ -32,109 +33,111 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  // Xử lý xóa bài viết
-  const handleDelete = async (id) => {
-    const jwtToken = localStorage.getItem("jwtToken");
+  const fetchFriends = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:8080/api/v1/blog/delete/${id}`,
-        {},//Khi dùng phương thức post nếu không gửi kèm body thì phải truyền body trống
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-          },
-        }
-      );
-  
-      if (response.data.status === 200) {
-        setProfileData({
-          ...profileData,
-          myBlog: profileData.myBlog.filter((blog) => blog.id !== id),
-        });
-        console.log("Blog deleted successfully");
-      } else {
-        setError("Failed to delete blog.");
-      }
-    } catch (err) {
-      console.error("Error deleting blog:", err);
-      setError("Network error during delete operation.");
-    }
-  };
-
-  // Bắt đầu chỉnh sửa
-  const handleEditClick = (blog) => {
-    setEditingBlog(blog.id);
-    setEditForm({ title: blog.title, content: blog.content });
-  };
-
-  // Xử lý chỉnh sửa
-  const handleEditSubmit = async (e, id) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(`http://localhost:8080/api/v1/blog/edit/${id}`, {
-        title: editForm.title,
-        content: editForm.content,
-      },{
+      const response = await axios.get("http://localhost:8080/api/v1/user/friend/all", {
         headers: {
-            Authorization: `Bearer ${token}`,
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
       if (response.data.status === 200) {
-        const updatedBlogs = profileData.myBlog.map((blog) =>
-          blog.id === id ? { ...blog, ...editForm } : blog
-        );
-        setProfileData({ ...profileData, myBlog: updatedBlogs });
-        setEditingBlog(null); // Thoát chế độ chỉnh sửa
+        setFriendsData(response.data.data);
       } else {
-        setError("Failed to update blog.");
+        setError("Error fetching friends data.");
       }
     } catch (err) {
-      setError("Network error during blog update.");
+      setError("Network error while fetching friends.");
     }
   };
 
-  return (
-    <div className="profile-container">
-      {error ? (
-        <p className="error-message">{error}</p>
-      ) : profileData ? (
-        <div>
-          <h1>Profile</h1>
-          <h2>Full Name: {profileData.fullName}</h2>
-          <h3>My Blogs:</h3>
-          <ul className="blog-list">
-            {profileData.myBlog.map((blog) => (
-              <li key={blog.id} className="blog-item">
-                {editingBlog === blog.id ? (
-                  // Form chỉnh sửa
-                  <form
-                    className="edit-form"
-                    onSubmit={(e) => handleEditSubmit(e, blog.id)}
-                  >
-                    <input
-                      type="text"
-                      value={editForm.title}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, title: e.target.value })
-                      }
-                      placeholder="Title"
-                    />
-                    <textarea
-                      value={editForm.content}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, content: e.target.value })
-                      }
-                      placeholder="Content"
-                    ></textarea>
-                    <button type="submit">Save</button>
-                    <button type="button" onClick={() => setEditingBlog(null)}>
-                      Cancel
-                    </button>
-                  </form>
-                ) : (
-                  // Hiển thị blog
-                  <>
+  const fetchLikedBlogs = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/v1/user/profile/like", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data.status === 200) {
+        setLikedBlogs(response.data.data.myBlog);
+      } else {
+        setError("Error fetching liked blogs.");
+      }
+    } catch (err) {
+      setError("Network error while fetching liked blogs.");
+    }
+  };
+
+  const fetchSharedBlogs = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/v1/user/profile/share", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data.status === 200) {
+        setSharedBlogs(response.data.data.myBlog);
+      } else {
+        setError("Error fetching shared blogs.");
+      }
+    } catch (err) {
+      setError("Network error while fetching shared blogs.");
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "ban-be") {
+      fetchFriends();
+    } else if (activeTab === "da-thich") {
+      fetchLikedBlogs();
+    } else if (activeTab === "da-chia-se") {
+      fetchSharedBlogs();
+    }
+  }, [activeTab]);
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "bai-viet":
+        return (
+          <div>
+            <h3>My Blogs:</h3>
+            <ul className="blog-list">
+              {profileData.myBlog.map((blog) => (
+                <li key={blog.id} className="blog-item">
+                  <h4>{blog.title}</h4>
+                  <p>{blog.content}</p>
+                  <small>
+                    Created At: {new Date(blog.createdAt).toLocaleString()}
+                  </small>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      case "ban-be":
+        return (
+          <div>
+            <h3>Friends:</h3>
+            <ul className="friend-list">
+              {friendsData.length > 0 ? (
+                friendsData.map((friend) => (
+                  <li key={friend.id} className="friend-item">
+                    {friend.fullName}
+                  </li>
+                ))
+              ) : (
+                <p>No friends found.</p>
+              )}
+            </ul>
+          </div>
+        );
+      case "da-thich":
+        return (
+          <div>
+            <h3>Liked Blogs:</h3>
+            <ul className="liked-blogs-list">
+              {likedBlogs.length > 0 ? (
+                likedBlogs.map((blog) => (
+                  <li key={blog.id} className="liked-blog-item">
                     <h4>{blog.title}</h4>
                     <p>{blog.content}</p>
                     <p><strong>Author:</strong> {blog.author}</p>
@@ -146,15 +149,81 @@ const Profile = () => {
                     <small>
                       Created At: {new Date(blog.createdAt).toLocaleString()}
                     </small>
-                    <div className="blog-actions">
-                      <button onClick={() => handleEditClick(blog)}>Edit</button>
-                      <button onClick={() => handleDelete(blog.id)}>Delete</button>
+                  </li>
+                ))
+              ) : (
+                <p>No liked blogs found.</p>
+              )}
+            </ul>
+          </div>
+        );
+      case "da-chia-se":
+        return (
+          <div>
+            <h3>Shared Blogs:</h3>
+            <ul className="shared-blogs-list">
+              {sharedBlogs.length > 0 ? (
+                sharedBlogs.map((blog) => (
+                  <li key={blog.id} className="shared-blog-item">
+                    <h4>{blog.title}</h4>
+                    <p>{blog.content}</p>
+                    <p><strong>Author:</strong> {blog.author}</p>
+                    <div className="blog-stats">
+                      <span>Likes: {blog.likesCount}</span>
+                      <span>Comments: {blog.commentsCount}</span>
+                      <span>Shares: {blog.sharesCount}</span>
                     </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
+                    <small>
+                      Created At: {new Date(blog.createdAt).toLocaleString()}
+                    </small>
+                  </li>
+                ))
+              ) : (
+                <p>No shared blogs found.</p>
+              )}
+            </ul>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="profile-container">
+      {error ? (
+        <p className="error-message">{error}</p>
+      ) : profileData ? (
+        <div>
+          <h1>Profile</h1>
+          <h2>Full Name: {profileData.fullName}</h2>
+          <div className="tabs">
+            <button
+              className={activeTab === "bai-viet" ? "active" : ""}
+              onClick={() => setActiveTab("bai-viet")}
+            >
+              Bài viết
+            </button>
+            <button
+              className={activeTab === "ban-be" ? "active" : ""}
+              onClick={() => setActiveTab("ban-be")}
+            >
+              Bạn bè
+            </button>
+            <button
+              className={activeTab === "da-thich" ? "active" : ""}
+              onClick={() => setActiveTab("da-thich")}
+            >
+              Đã thích
+            </button>
+            <button
+              className={activeTab === "da-chia-se" ? "active" : ""}
+              onClick={() => setActiveTab("da-chia-se")}
+            >
+              Đã chia sẻ
+            </button>
+          </div>
+          <div className="tab-content">{renderTabContent()}</div>
         </div>
       ) : (
         <p>Loading...</p>
