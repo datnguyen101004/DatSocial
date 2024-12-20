@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Css/Login.css";
 
-const Login = () => {
+const Login = ({setIsLoggedIn}) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,19 +24,18 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
-
+  
     try {
       const result = await axios.post(api, formData);
-
       const { status, message, data } = result.data;
-
+  
       if (status === 200) {
-        // Đăng nhập thành công
         localStorage.setItem("jwtToken", data.token);
         localStorage.setItem("refreshToken", data.refreshToken);
-
-        setSuccessMessage("Login successful!"); // Hiển thị thông báo thành công
-        setTimeout(() => navigate("/home"), 1000); // Điều hướng sau 2 giây
+  
+        setIsLoggedIn(true); // Cập nhật trạng thái đăng nhập
+        setSuccessMessage("Login successful!");
+        navigate("/home")
       } else {
         setError(message);
       }
@@ -48,6 +47,7 @@ const Login = () => {
       }
     }
   };
+  
 
   const handleBtnRegister = (e) => {
     e.preventDefault();
