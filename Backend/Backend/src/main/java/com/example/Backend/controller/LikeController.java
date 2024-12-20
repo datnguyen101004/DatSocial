@@ -14,7 +14,7 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @PostMapping("/{content-type}/{content-id}/")
+    @PostMapping("/{content-type}/{content-id}")
     public ResponseDto<String> like(@PathVariable("content-type") String type, @PathVariable("content-id") Long id, Authentication authentication) {
         return ResponseDto.success(likeService.like(type, id, authentication.getName()));
     }

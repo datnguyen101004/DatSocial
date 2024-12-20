@@ -6,4 +6,6 @@ public interface ShareService {
     String shareBlog(Long blogId, ShareRequest shareRequest, String email);
 
     String deleteShare(Long blogId, String name);
+
+    Boolean isShared(Long blogId, String name);
 }

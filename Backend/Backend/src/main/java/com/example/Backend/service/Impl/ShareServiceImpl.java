@@ -53,4 +53,11 @@ public class ShareServiceImpl implements ShareService {
         shareRepository.delete(share);
         return "Delete share successfully";
     }
+
+    @Override
+    public Boolean isShared(Long blogId, String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new NotFoundException("Blog not found"));
+        return shareRepository.findByBlogAndUser(blog, user).isPresent();
+    }
 }
