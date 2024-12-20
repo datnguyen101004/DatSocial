@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Css/Profile.css";
+import { useParams} from "react-router-dom";
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
@@ -11,11 +12,12 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("bai-viet"); // Tab mặc định
 
   const token = localStorage.getItem("jwtToken");
+  const { id } = useParams(); // Get the user id from URL params
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/v1/user/profile", {
+        const response = await axios.get(`http://localhost:8080/api/v1/user/${id}/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -35,7 +37,7 @@ const Profile = () => {
 
   const fetchFriends = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/v1/user/friend/all", {
+      const response = await axios.get(`http://localhost:8080/api/v1/user/${id}/friend/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,7 +54,7 @@ const Profile = () => {
 
   const fetchLikedBlogs = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/v1/user/profile/like", {
+      const response = await axios.get(`http://localhost:8080/api/v1/user/${id}/profile/like`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,7 +71,7 @@ const Profile = () => {
 
   const fetchSharedBlogs = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/v1/user/profile/share", {
+      const response = await axios.get(`http://localhost:8080/api/v1/user/${id}/profile/share`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -121,11 +123,11 @@ const Profile = () => {
               {friendsData.length > 0 ? (
                 friendsData.map((friend) => (
                   <li key={friend.id} className="friend-item">
-                    {friend.fullName}
+                    <a href={`/profile/${friend.id}`}>{friend.fullName}</a>
                   </li>
                 ))
               ) : (
-                <p>No friends found.</p>
+                <p>No friends.</p>
               )}
             </ul>
           </div>
@@ -152,7 +154,7 @@ const Profile = () => {
                   </li>
                 ))
               ) : (
-                <p>No liked blogs found.</p>
+                <p>No liked blogs.</p>
               )}
             </ul>
           </div>
@@ -179,7 +181,7 @@ const Profile = () => {
                   </li>
                 ))
               ) : (
-                <p>No shared blogs found.</p>
+                <p>No shared blogs.</p>
               )}
             </ul>
           </div>
