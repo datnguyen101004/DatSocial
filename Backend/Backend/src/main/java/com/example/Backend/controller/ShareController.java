@@ -23,4 +23,9 @@ public class ShareController {
     public ResponseDto<String> deleteShare(@PathVariable("blog-id") Long blogId, Authentication authentication) {
         return ResponseDto.success(shareService.deleteShare(blogId, authentication.getName()));
     }
+
+    @GetMapping("/{blog-id}/isShared")
+    public ResponseDto<Boolean> isShared(@PathVariable("blog-id") Long blogId, Authentication authentication) {
+        return ResponseDto.success(shareService.isShared(blogId, authentication.getName()));
+    }
 }

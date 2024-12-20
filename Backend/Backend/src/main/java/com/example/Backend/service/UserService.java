@@ -11,13 +11,13 @@ import java.util.List;
 public interface UserService {
     UserResponse profile(String name);
 
-    UserResponse profileShare(String name);
+    UserResponse profileShare(Long id);
 
-    UserResponse profileLike(String name);
+    UserResponse profileLike(Long id);
 
     List<FriendResponse> getAllFriendRequest(String name);
 
-    List<FriendListResponse> getAllFriend(String name);
+    List<FriendListResponse> getAllFriend(Long id);
 
-    List<SearchUserResponse> searchUser(String name, String email);
+    UserResponse getProfile(Long userId);
 }

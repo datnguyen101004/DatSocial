@@ -14,6 +14,7 @@ public interface BlogMapper {
     @Mapping(target = "likesCount", expression = "java(countLikes(blog))")
     @Mapping(target = "commentsCount", expression = "java(blog.getComments().size())")
     @Mapping(target = "sharesCount", expression = "java(blog.getShares().size())")
+    @Mapping(target = "authorId", expression = "java(blog.getAuthor().getId())")
     BlogResponseDto toBlogResponseDto(Blog blog);
 
     default int countLikes(Blog blog) {

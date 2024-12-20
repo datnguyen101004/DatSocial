@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-10T11:45:58+0700",
+    date = "2024-12-20T17:37:09+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.5 (JetBrains s.r.o.)"
 )
 @Component
@@ -43,6 +43,20 @@ public class FriendMapperImpl implements FriendMapper {
 
         friendListResponse.id( friend.getFriend().getId() );
         friendListResponse.fullName( friend.getFriend().getFullName() );
+
+        return friendListResponse.build();
+    }
+
+    @Override
+    public FriendListResponse toUserListResponse(Friend friend) {
+        if ( friend == null ) {
+            return null;
+        }
+
+        FriendListResponse.FriendListResponseBuilder friendListResponse = FriendListResponse.builder();
+
+        friendListResponse.id( friend.getUser().getId() );
+        friendListResponse.fullName( friend.getUser().getFullName() );
 
         return friendListResponse.build();
     }

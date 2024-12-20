@@ -15,4 +15,8 @@ public interface FriendMapper {
     @Mapping(target = "id", expression = "java(friend.getFriend().getId())")
     @Mapping(target = "fullName", expression = "java(friend.getFriend().getFullName())")
     FriendListResponse toFriendListResponse(Friend friend);
+
+    @Mapping(target = "id", expression = "java(friend.getUser().getId())")
+    @Mapping(target = "fullName", expression = "java(friend.getUser().getFullName())")
+    FriendListResponse toUserListResponse(Friend friend);
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-17T23:53:15+0700",
+    date = "2024-12-20T16:57:11+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.5 (JetBrains s.r.o.)"
 )
 @Component
@@ -31,6 +31,7 @@ public class BlogMapperImpl implements BlogMapper {
         blogResponseDto.likesCount( countLikes(blog) );
         blogResponseDto.commentsCount( blog.getComments().size() );
         blogResponseDto.sharesCount( blog.getShares().size() );
+        blogResponseDto.authorId( blog.getAuthor().getId() );
 
         return blogResponseDto.build();
     }

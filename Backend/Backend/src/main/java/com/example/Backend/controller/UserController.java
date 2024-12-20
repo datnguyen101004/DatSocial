@@ -25,14 +25,19 @@ public class UserController {
         return ResponseDto.success(userService.profile(authentication.getName()));
     }
 
-    @GetMapping("/profile/share")
-    public ResponseDto<UserResponse> profileShare(Authentication authentication) {
-        return ResponseDto.success(userService.profileShare(authentication.getName()));
+    @GetMapping("{user-id}/profile")
+    public ResponseDto<UserResponse> profile(@PathVariable("user-id") Long userId) {
+        return ResponseDto.success(userService.getProfile(userId));
     }
 
-    @GetMapping("/profile/like")
-    public ResponseDto<UserResponse> profileLike(Authentication authentication) {
-        return ResponseDto.success(userService.profileLike(authentication.getName()));
+    @GetMapping("/{userId}/profile/share")
+    public ResponseDto<UserResponse> profileShare(@PathVariable("userId") Long userId) {
+        return ResponseDto.success(userService.profileShare(userId));
+    }
+
+    @GetMapping("/{userId}/profile/like")
+    public ResponseDto<UserResponse> profileLike(@PathVariable("userId") Long userId) {
+        return ResponseDto.success(userService.profileLike(userId));
     }
 
     @GetMapping("/friend/request")
@@ -40,13 +45,8 @@ public class UserController {
         return ResponseDto.success(userService.getAllFriendRequest(authentication.getName()));
     }
 
-    @GetMapping("/friend/all")
-    public ResponseDto<List<FriendListResponse>> getAllFriend(Authentication authentication) {
-        return ResponseDto.success(userService.getAllFriend(authentication.getName()));
-    }
-
-    @GetMapping("/search")
-    public ResponseDto<List<SearchUserResponse>> searchUser(@RequestParam("name") String name, Authentication authentication) {
-        return ResponseDto.success(userService.searchUser(name, authentication.getName()));
+    @GetMapping("/{userId}/friend/all")
+    public ResponseDto<List<FriendListResponse>> getAllFriend(@PathVariable("userId") Long userId) {
+        return ResponseDto.success(userService.getAllFriend(userId));
     }
 }
