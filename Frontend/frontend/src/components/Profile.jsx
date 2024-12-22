@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Css/Profile.css";
 import { useParams} from "react-router-dom";
+import { FaUserPlus } from "react-icons/fa";
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
@@ -34,6 +35,27 @@ const Profile = () => {
 
     fetchProfile();
   }, []);
+
+  const sendFriendRequest = async (friendId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/v1/friend/${friendId}/sendRequest`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data.status === 200) {
+        alert("Friend request sent successfully!");
+      } else {
+        alert(response.data.message || "Error sending friend request.");
+      }
+    } catch (err) {
+      alert("Network error or server unavailable.");
+    }
+  };
 
   const fetchFriends = async () => {
     try {
@@ -96,6 +118,23 @@ const Profile = () => {
     }
   }, [activeTab]);
 
+  const renderFriends = () => {
+    return friendsData.length > 0 ? (
+      friendsData.map((friend) => (
+        <li key={friend.id} className="friend-item">
+          <a href={`/profile/${friend.id}`}>{friend.fullName}</a>
+          <FaUserPlus
+            className="add-friend-icon"
+            onClick={() => sendFriendRequest(friend.id)}
+            style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
+          />
+        </li>
+      ))
+    ) : (
+      <p>No friends.</p>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "bai-viet":
@@ -115,23 +154,13 @@ const Profile = () => {
             </ul>
           </div>
         );
-      case "ban-be":
-        return (
-          <div>
-            <h3>Friends:</h3>
-            <ul className="friend-list">
-              {friendsData.length > 0 ? (
-                friendsData.map((friend) => (
-                  <li key={friend.id} className="friend-item">
-                    <a href={`/profile/${friend.id}`}>{friend.fullName}</a>
-                  </li>
-                ))
-              ) : (
-                <p>No friends.</p>
-              )}
-            </ul>
-          </div>
-        );
+        case "ban-be":
+          return (
+            <div>
+              <h3>Friends:</h3>
+              <ul className="friend-list">{renderFriends()}</ul>
+            </div>
+          );
       case "da-thich":
         return (
           <div>
