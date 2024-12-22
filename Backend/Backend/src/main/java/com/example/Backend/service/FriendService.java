@@ -12,4 +12,8 @@ public interface FriendService {
     FriendResponse unFriend(Long friendId, String name);
 
     FriendResponse blockFriend(Long friendId, String name);
+
+    FriendResponse cancelRequest(Long friendId, String name);
+
+    String status(Long friendId, String name);
 }

@@ -113,4 +113,37 @@ public class FriendServiceImpl implements FriendService {
                 .build();
         return friendMapper.toFriendResponse(friend1);
     }
+
+    @Override
+    public FriendResponse cancelRequest(Long friendId, String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
+        User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
+        Optional<Friend> friend1 = friendRepository.findByUserAndFriendAndStatus(user, friend, FriendStatus.valueOf("PENDING"));
+        if (friend1.isEmpty()) {
+            throw new NotFoundException("You have not sent request to this user");
+        }
+        friend1.get().setStatus(FriendStatus.NONE);
+        friendRepository.save(friend1.get());
+        return friendMapper.toFriendResponse(friend1.get());
+    }
+
+    @Override
+    public String status(Long friendId, String name) {
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
+        User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
+        Optional<Friend> friend1 = friendRepository.findByUserAndFriendAndStatus(user, friend, FriendStatus.valueOf("ACCEPTED"));
+        Optional<Friend> friend2 = friendRepository.findByUserAndFriendAndStatus(friend, user, FriendStatus.valueOf("ACCEPTED"));
+        if (friend1.isPresent() || friend2.isPresent()) {
+            return "FRIEND";
+        }
+        Optional<Friend> friend3 = friendRepository.findByUserAndFriendAndStatus(user, friend, FriendStatus.valueOf("PENDING"));
+        if (friend3.isPresent()) {
+            return "PENDING";
+        }
+        Optional<Friend> friend4 = friendRepository.findByUserAndFriendAndStatus(friend, user, FriendStatus.valueOf("PENDING"));
+        if (friend4.isPresent()) {
+            return "RECEIVED";
+        }
+        return "NONE";
+    }
 }
