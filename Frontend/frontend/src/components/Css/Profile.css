@@ -236,3 +236,12 @@ h1, h2, h3 {
   color: #888;
   font-style: italic;
 }
+
+.add-friend-icon {
+  font-size: 1.5rem;
+  transition: color 0.3s;
+}
+
+.add-friend-icon:hover {
+  color: darkblue;
+}
