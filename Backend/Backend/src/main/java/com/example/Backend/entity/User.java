@@ -54,4 +54,10 @@ public class User {
     @OneToMany(mappedBy = "friend",cascade = CascadeType.ALL)
     private List<Friend> sentFriends; // user received friend request
 
+    @OneToMany(mappedBy = "sender",cascade = CascadeType.ALL)
+    private List<Message> sentMessages;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Room> rooms;
+
 }
