@@ -237,11 +237,21 @@ h1, h2, h3 {
   font-style: italic;
 }
 
+/* Icon for Adding/Removing Friend */
 .add-friend-icon {
-  font-size: 1.5rem;
-  transition: color 0.3s;
+  cursor: pointer; /* Biến icon thành một nút tương tác */
+  color: gray; /* Màu mặc định */
+  font-size: 24px; /* Kích thước mặc định */
+  margin-left: 10px; /* Khoảng cách từ nội dung xung quanh */
+  transition: transform 0.2s, color 0.2s; /* Hiệu ứng hover */
 }
 
 .add-friend-icon:hover {
-  color: darkblue;
+  transform: scale(1.2); /* Phóng to nhẹ khi hover */
+  color: green; /* Đổi màu thành xanh dương */
+}
+
+.add-friend-icon:active {
+  transform: scale(1); /* Reset hiệu ứng khi nhấn */
+  color: green; /* Đổi màu thành xanh lá khi nhấn */
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Css/Profile.css";
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 
 const Profile = () => {
@@ -11,6 +11,7 @@ const Profile = () => {
   const [sharedBlogs, setSharedBlogs] = useState([]); // Dữ liệu bài viết đã chia sẻ
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("bai-viet"); // Tab mặc định
+  const [isFriend, setIsFriend] = useState(false); // Trạng thái bạn bè
 
   const token = localStorage.getItem("jwtToken");
   const { id } = useParams(); // Get the user id from URL params
@@ -25,6 +26,7 @@ const Profile = () => {
         });
         if (response.data.status === 200) {
           setProfileData(response.data.data);
+          setIsFriend(response.data.data.isFriend); // Cập nhật trạng thái bạn bè từ API
         } else {
           setError(response.data.message || "Error fetching profile data.");
         }
@@ -34,12 +36,16 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [id, token]);
 
-  const sendFriendRequest = async (friendId) => {
+  const sendFriendRequest = async () => {
     try {
+      const endpoint = isFriend
+        ? `http://localhost:8080/api/v1/friend/${id}/cancelRequest`
+        : `http://localhost:8080/api/v1/friend/${id}/sendRequest`;
+
       const response = await axios.post(
-        `http://localhost:8080/api/v1/friend/${friendId}/sendRequest`,
+        endpoint,
         {},
         {
           headers: {
@@ -47,10 +53,11 @@ const Profile = () => {
           },
         }
       );
+
       if (response.data.status === 200) {
-        alert("Friend request sent successfully!");
+        setIsFriend(!isFriend); // Đổi trạng thái bạn bè
       } else {
-        alert(response.data.message || "Error sending friend request.");
+        alert(response.data.message || "Error processing friend request.");
       }
     } catch (err) {
       alert("Network error or server unavailable.");
@@ -123,11 +130,6 @@ const Profile = () => {
       friendsData.map((friend) => (
         <li key={friend.id} className="friend-item">
           <a href={`/profile/${friend.id}`}>{friend.fullName}</a>
-          <FaUserPlus
-            className="add-friend-icon"
-            onClick={() => sendFriendRequest(friend.id)}
-            style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
-          />
         </li>
       ))
     ) : (
@@ -154,13 +156,13 @@ const Profile = () => {
             </ul>
           </div>
         );
-        case "ban-be":
-          return (
-            <div>
-              <h3>Friends:</h3>
-              <ul className="friend-list">{renderFriends()}</ul>
-            </div>
-          );
+      case "ban-be":
+        return (
+          <div>
+            <h3>Friends:</h3>
+            <ul className="friend-list">{renderFriends()}</ul>
+          </div>
+        );
       case "da-thich":
         return (
           <div>
@@ -171,7 +173,9 @@ const Profile = () => {
                   <li key={blog.id} className="liked-blog-item">
                     <h4>{blog.title}</h4>
                     <p>{blog.content}</p>
-                    <p><strong>Author:</strong> {blog.author}</p>
+                    <p>
+                      <strong>Author:</strong> {blog.author}
+                    </p>
                     <div className="blog-stats">
                       <span>Likes: {blog.likesCount}</span>
                       <span>Comments: {blog.commentsCount}</span>
@@ -198,7 +202,9 @@ const Profile = () => {
                   <li key={blog.id} className="shared-blog-item">
                     <h4>{blog.title}</h4>
                     <p>{blog.content}</p>
-                    <p><strong>Author:</strong> {blog.author}</p>
+                    <p>
+                      <strong>Author:</strong> {blog.author}
+                    </p>
                     <div className="blog-stats">
                       <span>Likes: {blog.likesCount}</span>
                       <span>Comments: {blog.commentsCount}</span>
@@ -226,8 +232,21 @@ const Profile = () => {
         <p className="error-message">{error}</p>
       ) : profileData ? (
         <div>
-          <h1>Profile</h1>
-          <h2>Full Name: {profileData.fullName}</h2>
+          <div className="profile-header">
+            <h1>Profile</h1>
+            <h2>Full Name: {profileData.fullName}</h2>
+            <FaUserPlus
+              className="add-friend-icon"
+              onClick={sendFriendRequest}
+              style={{
+                cursor: "pointer",
+                color: isFriend ? "green" : "gray",
+                fontSize: "24px",
+                marginLeft: "10px",
+              }}
+              title={isFriend ? "Remove Friend" : "Add Friend"}
+            />
+          </div>
           <div className="tabs">
             <button
               className={activeTab === "bai-viet" ? "active" : ""}
