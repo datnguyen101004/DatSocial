@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +29,11 @@ public class RoomServiceImpl implements RoomService {
         User user1 = userRepository.findByEmail(name).orElseThrow(() -> new NotPermissionException("Not permission"));
         User user2 = userRepository.findById(createRoom.getReceiverId()).orElseThrow(() -> new NotPermissionException("Not permission"));
         String roomId = HandleChat.generateRoomId(user1.getId(), user2.getId());
-        Room room = roomRepository.findByRoomId(roomId);
+        Optional<Room> room = roomRepository.findByRoomId(roomId);
         List<User> users = new ArrayList<>();
         users.add(user1);
         users.add(user2);
-        if (room == null) {
+        if (room.isEmpty()) {
             //Create new room
             Room room1 = new Room();
             room1.setRoomId(roomId);
@@ -43,7 +44,7 @@ public class RoomServiceImpl implements RoomService {
         }
         else {
             //Get room
-            return roomMapper.toRoomResponse(room);
+            return roomMapper.toRoomResponse(room.get());
         }
     }
 }
