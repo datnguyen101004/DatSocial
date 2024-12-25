@@ -16,10 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
     private final RoomService roomService;
 
-    //Create room
-    @PostMapping("/create")
-    public ResponseDto<RoomResponse> createRoom(@RequestBody CreateRoom createRoom, Authentication authentication){
-        return ResponseDto.success(roomService.createRoom(createRoom, authentication.getName()));
+    //Get messages in room
+    @PostMapping("/messages")
+    public ResponseDto<RoomResponse> getMessages(@RequestBody CreateRoom createRoom, Authentication authentication) {
+        return ResponseDto.success(roomService.getMessages(createRoom, authentication.getName()));
     }
-
 }

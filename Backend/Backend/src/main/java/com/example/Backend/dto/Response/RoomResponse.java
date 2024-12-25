@@ -13,4 +13,5 @@ import java.util.List;
 public class RoomResponse {
     private String roomId;
     private List<Long> userIds;
+    private List<MessageResponse> messages;
 }

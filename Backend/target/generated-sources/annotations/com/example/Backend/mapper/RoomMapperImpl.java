@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-24T18:38:34+0700",
+    date = "2024-12-25T16:01:16+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.5 (JetBrains s.r.o.)"
 )
 @Component
@@ -24,6 +24,7 @@ public class RoomMapperImpl implements RoomMapper {
         roomResponse.roomId( room.getRoomId() );
 
         roomResponse.userIds( mapUserIds(room) );
+        roomResponse.messages( toMessageResponse(room.getMessages()) );
 
         return roomResponse.build();
     }

@@ -24,22 +24,26 @@ public class RoomServiceImpl implements RoomService {
     private final RoomMapper roomMapper;
 
     @Override
-    public RoomResponse createRoom(CreateRoom createRoom, String name) {
+    public RoomResponse getMessages(CreateRoom createRoom, String name) {
         User user1 = userRepository.findByEmail(name).orElseThrow(() -> new NotPermissionException("Not permission"));
         User user2 = userRepository.findById(createRoom.getReceiverId()).orElseThrow(() -> new NotPermissionException("Not permission"));
+        String roomId = HandleChat.generateRoomId(user1.getId(), user2.getId());
+        Room room = roomRepository.findByRoomId(roomId);
         List<User> users = new ArrayList<>();
         users.add(user1);
         users.add(user2);
-        Room room1 = roomRepository.findByRoomId(HandleChat.generateRoomId(user1.getId(), user2.getId()));
-        if (room1 != null) {
-            throw new AlreadyException("Room already exists");
+        if (room == null) {
+            //Create new room
+            Room room1 = new Room();
+            room1.setRoomId(roomId);
+            room1.setUsers(users);
+            room1.setMessages(new ArrayList<>());
+            roomRepository.save(room1);
+            return roomMapper.toRoomResponse(room1);
         }
-        Room room = new Room();
-        String roomId = HandleChat.generateRoomId(user1.getId(), user2.getId());
-        room.setRoomId(roomId);
-        room.setUsers(users);
-        room.setMessages(new ArrayList<>());
-        roomRepository.save(room);
-        return roomMapper.toRoomResponse(room);
+        else {
+            //Get room
+            return roomMapper.toRoomResponse(room);
+        }
     }
 }

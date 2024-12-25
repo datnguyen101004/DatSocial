@@ -20,7 +20,7 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "sender_id",
-            referencedColumnName = "id", nullable = false)
+            referencedColumnName = "id")
     private User sender;
     private String content;
     private LocalDateTime sendAt = LocalDateTime.now();
