@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Css/Profile.css";
-import { useParams } from "react-router-dom";
-import { FaUserPlus } from "react-icons/fa";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaUserPlus, FaUserCheck, FaUserTimes, FaUserClock, FaComments } from "react-icons/fa"; // Import thêm icon
 
 const Profile = () => {
   const [profileData, setProfileData] = useState(null);
@@ -12,6 +12,7 @@ const Profile = () => {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("bai-viet"); // Tab mặc định
   const [isFriend, setIsFriend] = useState(false); // Trạng thái bạn bè
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("jwtToken");
   const { id } = useParams(); // Get the user id from URL params
@@ -26,9 +27,20 @@ const Profile = () => {
         });
         if (response.data.status === 200) {
           setProfileData(response.data.data);
-          setIsFriend(response.data.data.isFriend); // Cập nhật trạng thái bạn bè từ API
         } else {
           setError(response.data.message || "Error fetching profile data.");
+        }
+
+        const friendStatus = await axios.post(`http://localhost:8080/api/v1/friend/${id}/status`, 
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+        if (friendStatus.data.status === 200){
+          setIsFriend(friendStatus.data.data);
+          console.log(isFriend);
         }
       } catch (err) {
         setError("Network error or server unavailable.");
@@ -38,11 +50,56 @@ const Profile = () => {
     fetchProfile();
   }, [id, token]);
 
-  const sendFriendRequest = async () => {
+  const getFriendIcon = (status) => {
+    switch (status) {
+      case "NONE": // Chưa gửi yêu cầu
+        return {
+          icon: FaUserPlus,
+          color: "gray",
+          title: "Add Friend",
+        };
+      case "FRIEND": // Đã là bạn bè
+        return {
+          icon: FaUserCheck,
+          color: "green",
+          title: "Remove Friend",
+        };
+      case "PENDING": // Đã gửi yêu cầu
+        return {
+          icon: FaUserClock,
+          color: "orange",
+          title: "Cancel Request",
+        };
+      case "RECEIVED": // Đã nhận yêu cầu
+        return {
+          icon: FaUserTimes,
+          color: "blue",
+          title: "Accept or Reject Request",
+        };
+      default:
+        return {
+          icon: FaUserPlus,
+          color: "gray",
+          title: "Add Friend",
+        };
+    }
+  };
+
+  const handleFriendRequest = async () => {
     try {
-      const endpoint = isFriend
-        ? `http://localhost:8080/api/v1/friend/${id}/cancelRequest`
-        : `http://localhost:8080/api/v1/friend/${id}/sendRequest`;
+      let endpoint = "";
+      console.log(isFriend);
+      if (isFriend === "NONE") {
+        endpoint = `http://localhost:8080/api/v1/friend/${id}/sendRequest`;
+      } else if (isFriend === "PENDING") {
+        endpoint = `http://localhost:8080/api/v1/friend/${id}/cancelRequest`;
+      }
+      else if (isFriend === "FRIEND") {
+        endpoint = `http://localhost:8080/api/v1/friend/${id}/unFriend`;
+      }
+      else if (isFriend === "RECEIVED"){
+        endpoint = `http://localhost:8080/api/v1/friend/${id}/acceptRequest`;
+      }
 
       const response = await axios.post(
         endpoint,
@@ -55,12 +112,12 @@ const Profile = () => {
       );
 
       if (response.data.status === 200) {
-        setIsFriend(!isFriend); // Đổi trạng thái bạn bè
+        setIsFriend(response.data.data.status); // Cập nhật trạng thái mới
       } else {
         alert(response.data.message || "Error processing friend request.");
       }
     } catch (err) {
-      alert("Network error or server unavailable.");
+      alert(err);
     }
   };
 
@@ -226,6 +283,12 @@ const Profile = () => {
     }
   };
 
+  const handleChat = () => {
+    navigate(`/chat`); // Điều hướng đến component Chat với tham số id
+  };
+
+  const { icon: FriendIcon, color, title } = getFriendIcon(isFriend);
+
   return (
     <div className="profile-container">
       {error ? (
@@ -235,16 +298,27 @@ const Profile = () => {
           <div className="profile-header">
             <h1>Profile</h1>
             <h2>Full Name: {profileData.fullName}</h2>
-            <FaUserPlus
-              className="add-friend-icon"
-              onClick={sendFriendRequest}
+            <FriendIcon
+              className="friend-icon"
+              onClick={handleFriendRequest}
               style={{
                 cursor: "pointer",
-                color: isFriend ? "green" : "gray",
+                color: color,
                 fontSize: "24px",
                 marginLeft: "10px",
               }}
-              title={isFriend ? "Remove Friend" : "Add Friend"}
+              title={title}
+            />
+            <FaComments
+              className="chat-icon"
+              onClick={handleChat}
+              style={{
+                cursor: "pointer",
+                color: "blue",
+                fontSize: "24px",
+                marginLeft: "10px",
+              }}
+              title="Chat with this user"
             />
           </div>
           <div className="tabs">

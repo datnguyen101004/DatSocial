@@ -17,14 +17,33 @@ const Home = () => {
     // Fetch blogs
     const fetchBlogs = async () => {
       try {
+        const token = localStorage.getItem("jwtToken");
         const response = await axios.get("http://localhost:8080/api/v1/blog/all", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Access-Control-Allow-Origin": "*",
           },
         });
+  
         if (response.status === 200) {
-          setPosts(response.data.data);
+          const blogs = response.data.data;
+  
+          // Kiểm tra trạng thái `isLiked` cho từng bài viết
+          const updatedBlogs = await Promise.all(
+            blogs.map(async (blog) => {
+              const likeStatus = await axios.get(
+                `http://localhost:8080/api/v1/like/blog/${blog.id}/isLiked`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              const shareStatus = await axios.get(
+                `http://localhost:8080/api/v1/share/${blog.id}/isShared`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              return { ...blog, isLiked: likeStatus.data.data, isShared: shareStatus.data.data }; // Thêm `isLiked` vào mỗi blog
+            })
+          );
+  
+          setPosts(updatedBlogs);
         }
       } catch (error) {
         setError("Hãy đăng nhập để xem các bài viết.");
