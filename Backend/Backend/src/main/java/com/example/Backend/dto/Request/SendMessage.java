@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SendMessage {
     private String content;
-    private Long senderId;
 }

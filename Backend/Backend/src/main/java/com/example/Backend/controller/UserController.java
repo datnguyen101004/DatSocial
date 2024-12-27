@@ -49,4 +49,9 @@ public class UserController {
     public ResponseDto<List<FriendListResponse>> getAllFriend(@PathVariable("userId") Long userId) {
         return ResponseDto.success(userService.getAllFriend(userId));
     }
+
+    @GetMapping("/friend/all")
+    public ResponseDto<List<FriendListResponse>> getAllMyFriend(Authentication authentication) {
+        return ResponseDto.success(userService.getAllMyFriend(authentication.getName()));
+    }
 }

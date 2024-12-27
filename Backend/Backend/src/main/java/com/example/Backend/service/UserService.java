@@ -20,4 +20,6 @@ public interface UserService {
     List<FriendListResponse> getAllFriend(Long id);
 
     UserResponse getProfile(Long userId);
+
+    List<FriendListResponse> getAllMyFriend(String name);
 }

@@ -23,9 +23,9 @@ public class MessageServiceImpl implements MessageService {
     private final MessageMapper messageMapper;
 
     @Override
-    public MessageResponse sendMessage(String roomId, SendMessage sendMessage) {
+    public MessageResponse sendMessage(String roomId, SendMessage sendMessage, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new NotFoundException("User not exist"));
         Room room = roomRepository.findByRoomId(roomId).orElseThrow(()-> new NotFoundException("Room not exist"));
-        User user = userRepository.findById(sendMessage.getSenderId()).orElseThrow(()-> new NotFoundException("User not exist"));
         Message message = Message.builder()
                 .content(sendMessage.getContent())
                 .sender(user)
