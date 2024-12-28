@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Css/Navbar.css"; // Import CSS
 import { Link, useNavigate } from "react-router-dom";
+import { FaSearch } from "react-icons/fa";
 
 const Navbar = ({ setIsLoggedIn }) => {
   const [user, setUser] = useState(null); // State to store user data
   const navigate = useNavigate(); // useNavigate for navigation
+  const [searchQuery, setSearchQuery] = useState("");
 
   const token = localStorage.getItem("jwtToken");
 
@@ -41,14 +43,31 @@ const Navbar = ({ setIsLoggedIn }) => {
     navigate("/login");
   };
 
+  const handleSearch = () =>{
+    navigate(`/home?search=${searchQuery}`);
+  }
+
+  // Xử lý khi nhấn phím Enter trong input tìm kiếm
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") { // Kiểm tra xem người dùng có nhấn Enter không
+      handleSearch(e); // Gọi hàm handleSearch khi nhấn Enter
+    }
+  };
+
   return (
     <nav className="navbar">
       <a href="/home" className="navbar-brand">DatSocial</a>
       <ul className="navbar-menu">
-        <li>
-          <input type="text" className="search-bar" placeholder="Search..." />
+        <li className="search-container">
+          <input type="text" 
+          onChange={(e)=>setSearchQuery(e.target.value)} 
+          className="search-bar" placeholder="Search..." 
+          onKeyDown={handleKeyDown}
+          />
+          <FaSearch className="search-icon" onClick={handleSearch}/>
         </li>
         <li><Link to="/addBlog">New Blog</Link></li>
+        <li><Link to="/chat">Chat</Link></li>
         {user && (
           <>
             <li className="navbar-user">

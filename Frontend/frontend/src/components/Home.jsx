@@ -3,6 +3,7 @@ import axios from "axios";
 import ViewBlog from "./ViewBlog"; // Import component ViewBlog
 import { FaBlog, FaVideo } from "react-icons/fa"; // Import icons
 import "./Css/Home.css";
+import { useParams, useLocation } from "react-router-dom";
 
 const Home = () => {
   const [posts, setPosts] = useState([]); // Blog posts
@@ -10,10 +11,13 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState("blog"); // Active tab
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { search } = useLocation(); // Lấy query parameters từ URL
+  const params = new URLSearchParams(search);
+  const searchQuery = params.get("search");
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-
+    console.log(searchQuery)
     // Fetch blogs
     const fetchBlogs = async () => {
       try {

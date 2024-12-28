@@ -1,14 +1,16 @@
 /* Tổng thể Navbar */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #007bff;
-    padding: 10px 20px;
-    color: white;
-    font-family: Arial, sans-serif;
-    position: relative; /* Để thanh tìm kiếm có thể căn giữa */
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007bff;
+  padding: 10px 20px;
+  color: white;
+  font-family: Arial, sans-serif;
+  position: sticky; /* Sticky navbar */
+  top: 0; /* Dính ở đầu trang */
+  z-index: 1000; /* Hiển thị phía trên các phần tử khác */
+}
   
   /* Logo hoặc thương hiệu */
   .navbar-brand {
@@ -44,46 +46,83 @@
     color: #ffdd57;
   }
   
-  /* Thanh tìm kiếm */
+  .search-container {
+    position: absolute;
+    left: 50%; 
+    transform: translateX(-50%); /* Căn giữa thanh tìm kiếm */
+    display: flex;
+    align-items: center; /* Căn giữa nội dung theo chiều dọc */
+
+  }
+  
+  
   .search-bar {
-    padding: 5px 15px;
-    border: none;
-    border-radius: 4px;
+    width: 100%;
+    padding: 5px 40px 5px 15px; /* Chèn khoảng trống để icon không đè lên text */
+    border: 1px solid #ccc;
+    border-radius: 10px; /* Tùy chỉnh góc bo tròn */
     font-size: 14px;
     outline: none;
-    width: 300px; /* Chiều rộng cụ thể cho thanh tìm kiếm */
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%); /* Căn giữa thanh tìm kiếm */
   }
   
+  .search-icon {
+    position: absolute;
+    right: 15px;
+    color: #888;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease; /* Hiệu ứng mượt mà */
+  }
+  
+  /* Thêm hiệu ứng khi focus vào thanh tìm kiếm */
+.search-container:focus-within .search-icon {
+  color: blue; /* Thay đổi màu khi có focus vào input */
+  transform: scale(1.2); /* Tăng kích thước icon khi focus */
+}
+
   /* Hiệu ứng khi focus */
   .search-bar:focus {
-    border: 2px solid #ffdd57;
+    border: 2px solid burlywood;
   }
   
-  /* Responsive cho màn hình nhỏ */
-  @media (max-width: 768px) {
-    .navbar {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .navbar-menu {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .navbar-menu li {
-      width: 100%;
-    }
-  
-    .search-bar {
-      width: 80%; /* Chiều rộng thanh tìm kiếm khi màn hình nhỏ */
-      position: relative;
-      transform: none;
-    }
+  /* Thanh tìm kiếm - Responsive */
+@media (max-width: 768px) {
+  .search-container {
+    position: relative; /* Chuyển từ absolute sang relative để phù hợp với màn hình nhỏ */
+    left: auto; /* Xóa căn giữa theo trục ngang */
+    transform: none; /* Xóa dịch chuyển */
+    width: 100%; /* Đưa thanh tìm kiếm chiếm toàn bộ chiều ngang */
+    margin: 10px 0; /* Thêm khoảng cách cho thanh tìm kiếm */
   }
+
+  .search-bar {
+    width: 100%; /* Thanh tìm kiếm rộng toàn bộ container */
+    padding: 10px 40px 10px 15px; /* Căn padding như trên desktop */
+    font-size: 16px; /* Tăng font-size một chút cho màn hình nhỏ */
+  }
+
+  .search-icon {
+    right: 10px; /* Đảm bảo icon căn phải đúng */
+  }
+
+  /* Navbar khi thu nhỏ */
+  .navbar {
+    flex-direction: column; /* Đặt các phần tử xếp dọc */
+    align-items: flex-start; /* Căn chỉnh bên trái */
+    padding: 10px; /* Điều chỉnh padding */
+  }
+
+  .navbar-menu {
+    flex-direction: column; /* Xếp dọc menu */
+    gap: 15px; /* Tăng khoảng cách giữa các mục */
+    width: 100%; /* Menu chiếm toàn bộ chiều ngang */
+  }
+
+  .navbar-brand {
+    margin-bottom: 10px; /* Thêm khoảng cách giữa logo và menu */
+  }
+}
+
   
   .navbar-user {
     margin-left: 20px;
