@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-d
 import AddBlog from "./components/AddBlog";
 import Profile from "./components/Profile";
 import { useState, useEffect } from "react";
+import Chat from "./components/Chat";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -54,6 +55,10 @@ function App() {
         <Route
           path="/profile/:id"
           element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chat"
+          element={isLoggedIn ? <Chat /> : <Navigate to="/login" />}
         />
       </Routes>
     </Router>
