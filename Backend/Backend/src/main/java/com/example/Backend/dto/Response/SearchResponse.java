@@ -12,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class SearchResponse {
-    List<SearchUserResponse> searchUserResponses;
-    List<BlogResponseDto> blogResponseDtos;
+    List<SearchUserResponse> userList;
+    List<BlogResponseDto> blogList;
 }

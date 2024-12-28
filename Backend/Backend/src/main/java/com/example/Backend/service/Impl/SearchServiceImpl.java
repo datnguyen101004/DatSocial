@@ -1,6 +1,5 @@
 package com.example.Backend.service.Impl;
 
-import com.example.Backend.dto.Response.BlogResponseDto;
 import com.example.Backend.dto.Response.SearchResponse;
 import com.example.Backend.dto.Response.SearchUserResponse;
 import com.example.Backend.entity.Blog;
@@ -26,11 +25,11 @@ public class SearchServiceImpl implements SearchService {
         List<User> search1 = userRepository.searchUsers(search);
         List<Blog> search2 = blogRepository.searchBlogs(search);
         return SearchResponse.builder()
-                .searchUserResponses(search1.stream().map(user -> SearchUserResponse.builder()
+                .userList(search1.stream().map(user -> SearchUserResponse.builder()
                         .id(user.getId())
                         .fullName(user.getFullName())
                         .build()).toList())
-                .blogResponseDtos(search2.stream().map(blogMapper::toBlogResponseDto).toList())
+                .blogList(search2.stream().map(blogMapper::toBlogResponseDto).toList())
                 .build();
     }
 }
