@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Css/Chat.css";
-import { useParams } from "react-router-dom";
+import SockJS from "sockjs-client";  // Import SockJS
+import { Client } from "@stomp/stompjs";  // Import STOMP Client
 
 const Chat = () => {
   const [friends, setFriends] = useState([]); // Danh sách bạn bè
@@ -11,7 +12,10 @@ const Chat = () => {
   const [messages, setMessages] = useState([]); // Tin nhắn
   const [newMessage, setNewMessage] = useState(""); // Tin nhắn mới
   const token = localStorage.getItem("jwtToken");
-  const { friendId } = useParams();
+  const [roomId, setRoomId] = useState("");
+
+  // Kết nối WebSocket
+  const [stompClient, setStompClient] = useState(null);
 
   // Fetch danh sách bạn bè
   useEffect(() => {
@@ -24,11 +28,6 @@ const Chat = () => {
         });
         if (response.data.status === 200) {
           setFriends(response.data.data);
-          if (friendId) {
-            const selected = response.data.data.find((friend) => friend.id === parseInt(friendId));
-            setSelectedFriend(selected);
-            fetchMessages(selected.id); // Lấy tin nhắn nếu đã có friendId
-          }
         } else {
           setFriendError(response.data.message || "Error fetching friends.");
         }
@@ -38,18 +37,21 @@ const Chat = () => {
     };
 
     fetchFriends();
-  }, [friendId, token]);
+  }, [token]);
 
   // Fetch tin nhắn
   const fetchMessages = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/chat/${id}`, {
+      const response = await axios.post(`http://localhost:8080/api/v1/rooms/messages`, {
+        "receiverId": id,
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (response.data.status === 200) {
-        setMessages(response.data.data);
+        setRoomId(response.data.data.roomId);
+        setMessages(response.data.data.messages);
       } else {
         setChatError("Error fetching messages.");
       }
@@ -64,28 +66,61 @@ const Chat = () => {
     fetchMessages(friend.id);
   };
 
-  // Gửi tin nhắn
-  const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
-    try {
-      const response = await axios.post(
-        `http://localhost:8080/api/v1/chat/${selectedFriend.id}`,
-        { message: newMessage },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.data.status === 200) {
-        setMessages([...messages, { text: newMessage, fromMe: true }]);
-        setNewMessage("");
-      } else {
-        setChatError("Error sending message.");
+  // Kết nối WebSocket khi roomId thay đổi
+  useEffect(() => {
+    if (!roomId) return; // Không kết nối nếu chưa có roomId
+
+    const socket = new SockJS("http://localhost:8080/chat");
+    const client = new Client({
+      webSocketFactory: () => socket,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+        withCredentials: true, // Đảm bảo credentials được gửi cùng yêu cầu
+      },
+      onConnect: () => {
+        console.log("WebSocket connected!");
+        // Đăng ký nhận tin nhắn cho roomId
+        client.subscribe(`/topic/${roomId}`, (message) => {
+          console.log("Received message:", message);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            JSON.parse(message.body),
+          ]);
+        });
+      },
+      onStompError: (frame) => {
+        console.error("WebSocket error:", frame);
+      },
+    });
+
+    client.activate();
+    setStompClient(client); // Lưu stompClient để có thể hủy kết nối sau này
+
+    // Dọn dẹp WebSocket khi component bị unmount hoặc roomId thay đổi
+    return () => {
+      if (client) {
+        client.deactivate();
       }
-    } catch (err) {
-      setChatError("Network error while sending message.");
-    }
+    };
+  }, [roomId, token]); // Chỉ khi roomId thay đổi mới kết nối WebSocket
+
+  // Gửi tin nhắn qua WebSocket
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    if (!stompClient || !stompClient.connected) return; // Kiểm tra nếu stompClient chưa được kết nối
+
+    // Gửi tin nhắn qua WebSocket
+    stompClient.publish({
+      destination: `/app/sendMessage/${roomId}`,
+      body: JSON.stringify({ content: newMessage }),
+    });
+
+    // Thêm tin nhắn vào UI
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { content: newMessage, fromMe: true },
+    ]);
+    setNewMessage("");
   };
 
   return (
@@ -125,11 +160,8 @@ const Chat = () => {
               <div className="messages">
                 {messages.length > 0 ? (
                   messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`message ${msg.fromMe ? "from-me" : "from-them"}`}
-                    >
-                      {msg.text}
+                    <div key={index} className={`message ${msg.fromMe ? "from-me" : "from-them"}`}>
+                      {msg.content}
                     </div>
                   ))
                 ) : (

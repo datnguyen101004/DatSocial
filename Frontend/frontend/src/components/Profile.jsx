@@ -52,6 +52,8 @@ const Profile = () => {
 
   const getFriendIcon = (status) => {
     switch (status) {
+      case "ME":
+        return {};
       case "NONE": // Chưa gửi yêu cầu
         return {
           icon: FaUserPlus,
@@ -287,7 +289,7 @@ const Profile = () => {
     navigate(`/chat`); // Điều hướng đến component Chat với tham số id
   };
 
-  const { icon: FriendIcon, color, title } = getFriendIcon(isFriend);
+  const { icon: FriendIcon, color, title } = getFriendIcon(isFriend) || {};
 
   return (
     <div className="profile-container">
@@ -298,17 +300,19 @@ const Profile = () => {
           <div className="profile-header">
             <h1>Profile</h1>
             <h2>Full Name: {profileData.fullName}</h2>
-            <FriendIcon
-              className="friend-icon"
-              onClick={handleFriendRequest}
-              style={{
-                cursor: "pointer",
-                color: color,
-                fontSize: "24px",
-                marginLeft: "10px",
-              }}
-              title={title}
-            />
+            {FriendIcon && (
+              <FriendIcon
+                className="friend-icon"
+                onClick={handleFriendRequest}
+                style={{
+                  cursor: "pointer",
+                  color: color,
+                  fontSize: "24px",
+                  marginLeft: "10px",
+                }}
+                title={title}
+              />
+            )}
             <FaComments
               className="chat-icon"
               onClick={handleChat}

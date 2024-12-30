@@ -3,10 +3,11 @@ import axios from "axios";
 import ViewBlog from "./ViewBlog"; // Import component ViewBlog
 import { FaBlog, FaVideo } from "react-icons/fa"; // Import icons
 import "./Css/Home.css";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
   const [posts, setPosts] = useState([]); // Blog posts
+  const [allPosts, setAllPosts] = useState([]);
   const [videos, setVideos] = useState([]); // Video posts
   const [activeTab, setActiveTab] = useState("blog"); // Active tab
   const [loading, setLoading] = useState(true);
@@ -14,10 +15,9 @@ const Home = () => {
   const { search } = useLocation(); // Lấy query parameters từ URL
   const params = new URLSearchParams(search);
   const searchQuery = params.get("search");
+  const token = localStorage.getItem("jwtToken");
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    console.log(searchQuery)
     // Fetch blogs
     const fetchBlogs = async () => {
       try {
@@ -46,7 +46,7 @@ const Home = () => {
               return { ...blog, isLiked: likeStatus.data.data, isShared: shareStatus.data.data }; // Thêm `isLiked` vào mỗi blog
             })
           );
-  
+          setAllPosts(blogs);
           setPosts(updatedBlogs);
         }
       } catch (error) {
@@ -78,6 +78,24 @@ const Home = () => {
     fetchBlogs();
     fetchVideos();
   }, []);
+
+  useEffect(() => {
+    if (searchQuery !== null) {
+      // Lọc bài viết dựa trên searchQuery
+      //Gọi api search
+      const searchPost = async () => {
+        const result = await axios.get(`http://localhost:8080/api/v1/search?data=${searchQuery}`, {
+          headers : {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+        setPosts(result.data.data.blogList);
+      }
+      searchPost();
+    } else {
+      setPosts(allPosts); // Hiển thị tất cả bài viết nếu không có tìm kiếm
+    }
+  }, [searchQuery, allPosts]);
 
   if (loading) {
     return <div className="home-container">Đang tải dữ liệu...</div>;
