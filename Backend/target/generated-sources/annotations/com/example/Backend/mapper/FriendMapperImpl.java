@@ -1,6 +1,6 @@
 package com.example.Backend.mapper;
 
-import com.example.Backend.dto.Response.FriendListResponse;
+import com.example.Backend.dto.Response.FriendInfo;
 import com.example.Backend.dto.Response.FriendResponse;
 import com.example.Backend.entity.Friend;
 import javax.annotation.processing.Generated;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-24T18:38:35+0700",
+    date = "2025-01-03T17:06:52+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.5 (JetBrains s.r.o.)"
 )
 @Component
@@ -34,30 +34,30 @@ public class FriendMapperImpl implements FriendMapper {
     }
 
     @Override
-    public FriendListResponse toFriendListResponse(Friend friend) {
+    public FriendInfo toFriendListResponse(Friend friend) {
         if ( friend == null ) {
             return null;
         }
 
-        FriendListResponse.FriendListResponseBuilder friendListResponse = FriendListResponse.builder();
+        FriendInfo.FriendInfoBuilder friendInfo = FriendInfo.builder();
 
-        friendListResponse.id( friend.getFriend().getId() );
-        friendListResponse.fullName( friend.getFriend().getFullName() );
+        friendInfo.id( friend.getFriend().getId() );
+        friendInfo.fullName( friend.getFriend().getFullName() );
 
-        return friendListResponse.build();
+        return friendInfo.build();
     }
 
     @Override
-    public FriendListResponse toUserListResponse(Friend friend) {
+    public FriendInfo toUserListResponse(Friend friend) {
         if ( friend == null ) {
             return null;
         }
 
-        FriendListResponse.FriendListResponseBuilder friendListResponse = FriendListResponse.builder();
+        FriendInfo.FriendInfoBuilder friendInfo = FriendInfo.builder();
 
-        friendListResponse.id( friend.getUser().getId() );
-        friendListResponse.fullName( friend.getUser().getFullName() );
+        friendInfo.id( friend.getUser().getId() );
+        friendInfo.fullName( friend.getUser().getFullName() );
 
-        return friendListResponse.build();
+        return friendInfo.build();
     }
 }

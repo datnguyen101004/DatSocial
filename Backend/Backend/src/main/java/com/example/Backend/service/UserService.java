@@ -1,8 +1,8 @@
 package com.example.Backend.service;
 
-import com.example.Backend.dto.Response.FriendListResponse;
+import com.example.Backend.dto.Response.FriendInfo;
 import com.example.Backend.dto.Response.FriendResponse;
-import com.example.Backend.dto.Response.SearchUserResponse;
+import com.example.Backend.dto.Response.ListFriendResponse;
 import com.example.Backend.dto.Response.UserResponse;
 
 
@@ -17,9 +17,9 @@ public interface UserService {
 
     List<FriendResponse> getAllFriendRequest(String name);
 
-    List<FriendListResponse> getAllFriend(Long id);
+    List<FriendInfo> getAllFriend(Long id);
 
     UserResponse getProfile(Long userId);
 
-    List<FriendListResponse> getAllMyFriend(String name);
+    ListFriendResponse getAllMyFriend(String name);
 }

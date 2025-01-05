@@ -150,6 +150,9 @@ public class FriendServiceImpl implements FriendService {
     public String status(Long friendId, String name) {
         User user = userRepository.findByEmail(name).orElseThrow(() -> new NotFoundException("User not found"));
         User friend = userRepository.findById(friendId).orElseThrow(() -> new NotFoundException("Friend not found"));
+        if (user.getId().equals(friend.getId())) {
+            return "ME";
+        }
         Optional<Friend> friend1 = friendRepository.findByUserAndFriendAndStatus(user, friend, FriendStatus.valueOf("ACCEPTED"));
         Optional<Friend> friend2 = friendRepository.findByUserAndFriendAndStatus(friend, user, FriendStatus.valueOf("ACCEPTED"));
         if (friend1.isPresent() || friend2.isPresent()) {
