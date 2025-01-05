@@ -1,4 +1,4 @@
-package com.example.Backend.dto.Request;
+package com.example.Backend.dto.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SendMessage {
-    private Long senderId;
-    private String content;
+public class FriendInfo {
+    String fullName;
+    Long id;
 }

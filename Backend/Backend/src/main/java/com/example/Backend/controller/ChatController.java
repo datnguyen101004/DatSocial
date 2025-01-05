@@ -7,20 +7,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Controller
-@CrossOrigin("*")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class ChatController {
 
     private final MessageService messageService;
 
-    @MessageMapping("/sendMessage/{roomId}")
-    @SendTo("/topic/{roomId}")
-    public MessageResponse sendMessage(@DestinationVariable String roomId, SendMessage sendMessage, Authentication authentication) {
-        return messageService.sendMessage(roomId, sendMessage, authentication.getName());
+    @MessageMapping("/sendMessage/{roomId}") // /app/sendMessage/{roomId}
+    @SendTo("/topic/{roomId}") // /topic/{roomId}
+    public MessageResponse sendMessage(@DestinationVariable String roomId, SendMessage sendMessage) {
+        return messageService.sendMessage(roomId, sendMessage);
     }
 }

@@ -24,6 +24,7 @@ public interface RoomMapper {
         return messages.stream()
                 .map(message -> MessageResponse.builder()
                         .id(message.getId())
+                        .senderId(message.getSender() != null ? message.getSender().getId() : null)
                         .sender(message.getSender() != null ? message.getSender().getFullName() : null)
                         .content(message.getContent())
                         .sendAt(message.getSendAt())

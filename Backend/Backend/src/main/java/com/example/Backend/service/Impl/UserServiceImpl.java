@@ -1,7 +1,8 @@
 package com.example.Backend.service.Impl;
 
-import com.example.Backend.dto.Response.FriendListResponse;
+import com.example.Backend.dto.Response.FriendInfo;
 import com.example.Backend.dto.Response.FriendResponse;
+import com.example.Backend.dto.Response.ListFriendResponse;
 import com.example.Backend.dto.Response.UserResponse;
 import com.example.Backend.entity.Enum.FriendStatus;
 import com.example.Backend.entity.Friend;
@@ -68,12 +69,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<FriendListResponse> getAllFriend(Long id) {
+    public List<FriendInfo> getAllFriend(Long id) {
         User user = userRepository.findById(id).orElseThrow(()->new NotFoundException("User not found"));
         List<Friend> friends = friendRepository.findByUserAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
         List<Friend> friends1 = friendRepository.findByFriendAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
-        List<FriendListResponse> friendListResponses1 = new java.util.ArrayList<>(friends.stream().map(friendMapper::toFriendListResponse).toList());
-        List<FriendListResponse> friendListResponses2 = friends1.stream().map(friendMapper::toUserListResponse).toList();
+        List<FriendInfo> friendListResponses1 = new java.util.ArrayList<>(friends.stream().map(friendMapper::toFriendListResponse).toList());
+        List<FriendInfo> friendListResponses2 = friends1.stream().map(friendMapper::toUserListResponse).toList();
         friendListResponses1.addAll(friendListResponses2);
         return friendListResponses1;
     }
@@ -89,13 +90,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<FriendListResponse> getAllMyFriend(String name) {
+    public ListFriendResponse getAllMyFriend(String name) {
         User user = userRepository.findByEmail(name).orElseThrow(()->new NotFoundException("User not found"));
         List<Friend> friends = friendRepository.findByUserAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
         List<Friend> friends1 = friendRepository.findByFriendAndStatus(user, FriendStatus.valueOf("ACCEPTED"));
-        List<FriendListResponse> friendListResponses1 = new java.util.ArrayList<>(friends.stream().map(friendMapper::toFriendListResponse).toList());
-        List<FriendListResponse> friendListResponses2 = friends1.stream().map(friendMapper::toUserListResponse).toList();
+        List<FriendInfo> friendListResponses1 = new java.util.ArrayList<>(friends.stream().map(friendMapper::toFriendListResponse).toList());
+        List<FriendInfo> friendListResponses2 = friends1.stream().map(friendMapper::toUserListResponse).toList();
         friendListResponses1.addAll(friendListResponses2);
-        return friendListResponses1;
+        return ListFriendResponse.builder()
+                .friendList(friendListResponses1)
+                .userId(user.getId())
+                .build();
     }
 }

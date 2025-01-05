@@ -9,5 +9,6 @@ import org.mapstruct.Mapping;
 public interface MessageMapper {
 
     @Mapping(target = "sender", expression = "java(message.getSender() != null ? message.getSender().getFullName() : null)")
+    @Mapping(target = "senderId", expression = "java(message.getSender().getId())")
     MessageResponse toMessageResponse(Message message);
 }

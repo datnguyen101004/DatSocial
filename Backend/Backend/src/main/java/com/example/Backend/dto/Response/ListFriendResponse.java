@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FriendListResponse {
-    String fullName;
-    Long id;
+public class ListFriendResponse {
+    private Long userId;
+    private List<FriendInfo> friendList;
 }

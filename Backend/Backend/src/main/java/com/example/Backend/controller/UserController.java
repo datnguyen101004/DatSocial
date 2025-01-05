@@ -1,13 +1,12 @@
 package com.example.Backend.controller;
 
-import com.example.Backend.dto.Response.FriendListResponse;
+import com.example.Backend.dto.Response.FriendInfo;
 import com.example.Backend.dto.Response.FriendResponse;
-import com.example.Backend.dto.Response.SearchUserResponse;
+import com.example.Backend.dto.Response.ListFriendResponse;
 import com.example.Backend.dto.Response.UserResponse;
 import com.example.Backend.dto.ResponseDto;
 import com.example.Backend.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,12 +45,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friend/all")
-    public ResponseDto<List<FriendListResponse>> getAllFriend(@PathVariable("userId") Long userId) {
+    public ResponseDto<List<FriendInfo>> getAllFriend(@PathVariable("userId") Long userId) {
         return ResponseDto.success(userService.getAllFriend(userId));
     }
 
     @GetMapping("/friend/all")
-    public ResponseDto<List<FriendListResponse>> getAllMyFriend(Authentication authentication) {
+    public ResponseDto<ListFriendResponse> getAllMyFriend(Authentication authentication) {
         return ResponseDto.success(userService.getAllMyFriend(authentication.getName()));
     }
 }
