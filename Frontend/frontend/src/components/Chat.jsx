@@ -11,8 +11,10 @@ const Chat = () => {
   const [selectedFriend, setSelectedFriend] = useState(null); // Bạn bè đã chọn
   const [messages, setMessages] = useState([]); // Tin nhắn
   const [newMessage, setNewMessage] = useState(""); // Tin nhắn mới
+  const [roomId, setRoomId] = useState(""); // roomId cho chat
+  const [userId, setUserId] = useState(null); // userId
+
   const token = localStorage.getItem("jwtToken");
-  const [roomId, setRoomId] = useState("");
 
   // Kết nối WebSocket
   const [stompClient, setStompClient] = useState(null);
@@ -27,44 +29,55 @@ const Chat = () => {
           },
         });
         if (response.data.status === 200) {
-          setFriends(response.data.data);
+          setFriends(response.data.data.friendList);
+          setUserId(response.data.data.userId);
         } else {
-          setFriendError(response.data.message || "Error fetching friends.");
+          setFriendError(response.data.message || "Lỗi khi tải danh sách bạn bè.");
         }
       } catch (err) {
-        setFriendError("Network error or server unavailable.");
+        setFriendError("Lỗi mạng hoặc server không khả dụng.");
       }
     };
 
     fetchFriends();
-  }, [token]);
+  }, []);
 
   // Fetch tin nhắn
   const fetchMessages = async (id) => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/v1/rooms/messages`, {
-        "receiverId": id,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `http://localhost:8080/api/v1/rooms/messages`,
+        { receiverId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.data.status === 200) {
+        setChatError(null);
         setRoomId(response.data.data.roomId);
         setMessages(response.data.data.messages);
       } else {
-        setChatError("Error fetching messages.");
+        setChatError("Lỗi khi tải tin nhắn.");
+        console.log("API response error: ", response.data.message); // Log lỗi nếu có
       }
     } catch (err) {
-      setChatError("Network error while fetching messages.");
+      setChatError("Lỗi mạng khi tải tin nhắn.");
+      console.log("Network error:", err); // Log lỗi chi tiết từ axios
     }
   };
 
   // Xử lý khi click vào bạn bè
   const handleFriendClick = (friend) => {
     setSelectedFriend(friend);
-    fetchMessages(friend.id);
   };
+
+  useEffect(() => {
+    if (selectedFriend) {
+      fetchMessages(selectedFriend.id);
+    }
+  }, [selectedFriend]);
 
   // Kết nối WebSocket khi roomId thay đổi
   useEffect(() => {
@@ -73,28 +86,21 @@ const Chat = () => {
     const socket = new SockJS("http://localhost:8080/chat");
     const client = new Client({
       webSocketFactory: () => socket,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-        withCredentials: true, // Đảm bảo credentials được gửi cùng yêu cầu
-      },
       onConnect: () => {
-        console.log("WebSocket connected!");
+        console.log("WebSocket kết nối thành công!");
         // Đăng ký nhận tin nhắn cho roomId
         client.subscribe(`/topic/${roomId}`, (message) => {
-          console.log("Received message:", message);
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            JSON.parse(message.body),
-          ]);
+          const newMessage = JSON.parse(message.body);
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
         });
       },
       onStompError: (frame) => {
-        console.error("WebSocket error:", frame);
+        console.error("Lỗi WebSocket:", frame);
       },
     });
 
     client.activate();
-    setStompClient(client); // Lưu stompClient để có thể hủy kết nối sau này
+    setStompClient(client);
 
     // Dọn dẹp WebSocket khi component bị unmount hoặc roomId thay đổi
     return () => {
@@ -102,32 +108,32 @@ const Chat = () => {
         client.deactivate();
       }
     };
-  }, [roomId, token]); // Chỉ khi roomId thay đổi mới kết nối WebSocket
+  }, [roomId, token]); // Kết nối lại WebSocket mỗi khi roomId thay đổi
 
   // Gửi tin nhắn qua WebSocket
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    if (!stompClient || !stompClient.connected) return; // Kiểm tra nếu stompClient chưa được kết nối
+    if (!newMessage.trim()) return; // Kiểm tra nếu tin nhắn trống
+    if (!stompClient || !stompClient.connected) return; // Kiểm tra kết nối WebSocket
+
+    //Tạo body gửi tin nhắn
+    const messagePayload = {
+      senderId: userId, // Thêm senderId vào tin nhắn
+      content: newMessage, // Nội dung tin nhắn
+    };
 
     // Gửi tin nhắn qua WebSocket
     stompClient.publish({
       destination: `/app/sendMessage/${roomId}`,
-      body: JSON.stringify({ content: newMessage }),
+      body: JSON.stringify(messagePayload),
     });
-
-    // Thêm tin nhắn vào UI
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { content: newMessage, fromMe: true },
-    ]);
-    setNewMessage("");
+    setNewMessage(""); // Xóa input sau khi gửi
   };
 
   return (
     <div className="chat-container">
       {/* Sidebar */}
       <div className="chat-sidebar">
-        <h3>Friends</h3>
+        <h3>Danh sách bạn bè</h3>
         {friendError ? (
           <p className="error-message">{friendError}</p>
         ) : (
@@ -143,7 +149,7 @@ const Chat = () => {
                 </li>
               ))
             ) : (
-              <p>No friends available.</p>
+              <p>Không có bạn bè.</p>
             )}
           </ul>
         )}
@@ -153,19 +159,22 @@ const Chat = () => {
       <div className="chat-main">
         {selectedFriend ? (
           <div className="chat-content">
-            <h3>Chat with {selectedFriend.fullName}</h3>
+            <h3>Chat với {selectedFriend.fullName}</h3>
             {chatError ? (
               <p className="error-message">{chatError}</p>
             ) : (
               <div className="messages">
                 {messages.length > 0 ? (
                   messages.map((msg, index) => (
-                    <div key={index} className={`message ${msg.fromMe ? "from-me" : "from-them"}`}>
+                    <div
+                      key={index}
+                      className={`message ${msg.senderId === userId ? "from-me" : "from-them"}`}
+                    >
                       {msg.content}
                     </div>
                   ))
                 ) : (
-                  <p>No messages yet.</p>
+                  <p>Chưa có tin nhắn nào.</p>
                 )}
               </div>
             )}
@@ -174,13 +183,13 @@ const Chat = () => {
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
+                placeholder="Gõ tin nhắn..."
               />
-              <button onClick={handleSendMessage}>Send</button>
+              <button onClick={handleSendMessage}>Gửi</button>
             </div>
           </div>
         ) : (
-          <p>Select a friend to start a chat.</p>
+          <p>Chọn bạn để bắt đầu trò chuyện.</p>
         )}
       </div>
     </div>
