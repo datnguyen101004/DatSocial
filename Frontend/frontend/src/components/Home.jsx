@@ -46,7 +46,7 @@ const Home = () => {
               return { ...blog, isLiked: likeStatus.data.data, isShared: shareStatus.data.data }; // Thêm `isLiked` vào mỗi blog
             })
           );
-          setAllPosts(blogs);
+          setAllPosts(updatedBlogs);
           setPosts(updatedBlogs);
         }
       } catch (error) {
@@ -89,7 +89,13 @@ const Home = () => {
             Authorization: `Bearer ${token}`,
           }
         });
-        setPosts(result.data.data.blogList);
+        const searchIds = result.data.data.blogList.map((blog)=>blog.id);
+
+        const filteredPosts = allPosts.filter((post) =>
+          searchIds.includes(post.id)
+        );
+
+        setPosts(filteredPosts);
       }
       searchPost();
     } else {
