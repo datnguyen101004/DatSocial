@@ -110,4 +110,16 @@
   .chat-input button:hover {
     background-color: #0056b3;
   }
+
+  .messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    display: flex; /* Cần thêm dòng này */
+    flex-direction: column; /* Đảm bảo các tin nhắn được xếp theo chiều dọc */
+  }
   

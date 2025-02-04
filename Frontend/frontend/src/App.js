@@ -17,7 +17,6 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
-    console.log("Token:", token); // Kiểm tra token
     if (token) {
       setIsLoggedIn(true);
     } else {

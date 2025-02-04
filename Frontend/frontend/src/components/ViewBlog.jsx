@@ -20,7 +20,6 @@ const ViewBlog = ({ post, setPosts }) => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((p) =>
