@@ -1,5 +1,6 @@
 package com.example.Backend.service.Impl;
 
+import com.example.Backend.Utils.HandleEmail;
 import com.example.Backend.dto.Request.LoginDto;
 import com.example.Backend.dto.Request.RefreshTokenDto;
 import com.example.Backend.dto.Request.RegisterDto;
@@ -9,14 +10,17 @@ import com.example.Backend.entity.User;
 import com.example.Backend.exception.CustomException.NotFoundException;
 import com.example.Backend.exception.CustomException.InvalidCredentialException;
 import com.example.Backend.repository.UserRepository;
+import com.example.Backend.service.AsyncService;
 import com.example.Backend.service.AuthService;
 import com.example.Backend.service.JwtService;
+import com.example.Backend.service.VerifyCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +30,11 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final AsyncService asyncService;
+    private final VerifyCodeService verifyCodeService;
 
     @Override
-    public TokenResponseDto register(RegisterDto registerDto) {
+    public String register(RegisterDto registerDto) {
         if (userRepository.existsByEmail(registerDto.getEmail())) {
             throw new NotFoundException("Email is already in use");
         }
@@ -37,11 +43,11 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         user.setRoles(Roles.ROLE_USER);
-        user.setEnable(true);
         userRepository.save(user);
-        String token = jwtService.generateAccessToken(user.getEmail());
-        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
-        return new TokenResponseDto(token, refreshToken);
+        String code = HandleEmail.createCode();
+        verifyCodeService.saveCode(user.getEmail(), code);
+        asyncService.sendEmail(user.getEmail(), "Welcome to our application", "You have successfully registered to our application. Please click the link below to verify your account: http://localhost:8080/api/v1/auth/verify?email=" + user.getEmail() + "&code=" + code);
+        return "User registered successfully. Please check your email to verify your account";
     }
 
     @Override
@@ -75,5 +81,16 @@ public class AuthServiceImpl implements AuthService {
         else {
             throw new NotFoundException("User not found");
         }
+    }
+
+    @Override
+    public String verify(String email, String code) {
+        if (verifyCodeService.verifyCode(email, code)) {
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+            user.setEnable(true);
+            userRepository.save(user);
+            return "SUCCESS";
+        }
+        throw new NotFoundException("Invalid code");
     }
 }

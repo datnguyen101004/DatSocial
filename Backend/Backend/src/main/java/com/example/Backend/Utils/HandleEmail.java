@@ -2,13 +2,15 @@ package com.example.Backend.Utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
+
 @UtilityClass
 public class HandleEmail {
     public String createCode() {
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            code.append((int) (Math.random() * 10));
-        }
-        return code.toString();
+        return IntStream.range(0, 6)
+                // Use ThreadLocalRandom to generate random number with multi-threading
+                .mapToObj(i -> String.valueOf(ThreadLocalRandom.current().nextInt(0, 10)))
+                .reduce("", String::concat);
     }
 }

@@ -6,9 +6,11 @@ import com.example.Backend.dto.Request.RegisterDto;
 import com.example.Backend.dto.Response.TokenResponseDto;
 
 public interface AuthService {
-    TokenResponseDto register(RegisterDto registerDto);
+    String register(RegisterDto registerDto);
 
     TokenResponseDto login(LoginDto loginDto);
 
     TokenResponseDto refresh(RefreshTokenDto refreshToken);
+
+    String verify(String email, String code);
 }

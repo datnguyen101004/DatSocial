@@ -59,5 +59,4 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     private List<Room> rooms;
-
 }

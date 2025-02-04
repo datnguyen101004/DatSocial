@@ -18,8 +18,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseDto<TokenResponseDto> register(@RequestBody RegisterDto registerDto) {
+    public ResponseDto<String> register(@RequestBody RegisterDto registerDto) {
         return ResponseDto.success(authService.register(registerDto));
+    }
+
+    @GetMapping("/verify")
+    public ResponseDto<String> verify(@RequestParam String email, @RequestParam String code) {
+        return ResponseDto.success(authService.verify(email, code));
     }
 
     @PostMapping("/login")
