@@ -18,18 +18,18 @@ public class VerifyCodeImpl implements VerifyCodeService {
         VerifyCode verifyCode = new VerifyCode();
         verifyCode.setEmail(email);
         verifyCode.setCode(code);
-        verifyCode.setExpireAt(LocalDateTime.now().plusSeconds(60));
+        verifyCode.setExpireAt(LocalDateTime.now().plusSeconds(60*5));
         verifyCodeRepository.save(verifyCode);
     }
 
     @Override
-    public boolean verifyCode(String email, String code) {
-        VerifyCode verifyCode = verifyCodeRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
+    public String verifyCode(String code) {
+        VerifyCode verifyCode = verifyCodeRepository.findByCode(code).orElseThrow(() -> new RuntimeException("Invalid code"));
         if (verifyCode.getCode().equals(code) && !verifyCode.getExpireAt().isBefore(LocalDateTime.now()) && !verifyCode.isUsed()) {
             verifyCode.setUsed(true);
             verifyCodeRepository.save(verifyCode);
-            return true;
+            return verifyCode.getEmail();
         }
-        return false;
+        return "";
     }
 }

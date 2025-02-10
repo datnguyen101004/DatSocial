@@ -20,8 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -46,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         String code = HandleEmail.createCode();
         verifyCodeService.saveCode(user.getEmail(), code);
-        asyncService.sendEmail(user.getEmail(), "Welcome to our application", "You have successfully registered to our application. Please click the link below to verify your account: http://localhost:8080/api/v1/auth/verify?email=" + user.getEmail() + "&code=" + code);
+        asyncService.sendEmail(user.getEmail(), "Welcome to our application", "You have successfully registered to our application. Please verify your account using this code: " + code);
         return "User registered successfully. Please check your email to verify your account";
     }
 
@@ -84,13 +82,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String verify(String email, String code) {
-        if (verifyCodeService.verifyCode(email, code)) {
-            User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
-            user.setEnable(true);
-            userRepository.save(user);
-            return "SUCCESS";
-        }
-        throw new NotFoundException("Invalid code");
+    public TokenResponseDto verify(String code) {
+        String email = verifyCodeService.verifyCode(code);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+        user.setEnable(true);
+        userRepository.save(user);
+        return new TokenResponseDto(jwtService.generateAccessToken(email), jwtService.generateRefreshToken(email));
     }
 }

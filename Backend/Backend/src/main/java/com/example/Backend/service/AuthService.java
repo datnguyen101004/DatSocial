@@ -12,5 +12,5 @@ public interface AuthService {
 
     TokenResponseDto refresh(RefreshTokenDto refreshToken);
 
-    String verify(String email, String code);
+    TokenResponseDto verify(String code);
 }

@@ -23,8 +23,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseDto<String> verify(@RequestParam String email, @RequestParam String code) {
-        return ResponseDto.success(authService.verify(email, code));
+    public ResponseDto<TokenResponseDto> verify(@RequestParam String code) {
+        return ResponseDto.success(authService.verify(code));
     }
 
     @PostMapping("/login")
