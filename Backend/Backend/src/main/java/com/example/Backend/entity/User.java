@@ -1,5 +1,6 @@
 package com.example.Backend.entity;
 
+import com.example.Backend.entity.Enum.LoginMethod;
 import com.example.Backend.entity.Enum.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -27,12 +28,13 @@ public class User {
     @Email(message = "Please enter a valid e-mail address")
     private String email;
 
-    @Column(nullable = false)
-    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Roles roles;
+
+    @Enumerated(EnumType.STRING)
+    private LoginMethod loginMethod;
 
     private boolean enable = false;
 

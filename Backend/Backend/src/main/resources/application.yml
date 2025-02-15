@@ -11,6 +11,12 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  session:
+    store-type: redis
   main:
     allow-circular-references: true
   mail:
@@ -24,7 +30,15 @@ spring:
           auth: true
           starttls:
             enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+
 jwt:
   secret-key: 'V2VsYzBtZV90MF9teV9ibDBnX3dlYnMxdGVfRGF0X2lzX0FkbTFu'
-  expiredAccess: '3h'
+  expiredAccess: '2h'
   expiredRefresh: '1d'

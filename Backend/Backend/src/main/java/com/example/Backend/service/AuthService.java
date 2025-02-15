@@ -13,4 +13,6 @@ public interface AuthService {
     TokenResponseDto refresh(RefreshTokenDto refreshToken);
 
     TokenResponseDto verify(String code);
+
+    TokenResponseDto loginWithGoogle(String email);
 }

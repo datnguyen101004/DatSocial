@@ -46,6 +46,7 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(r->r
                         .requestMatchers(
+                                "/oauth2/**",
                                 "/chat/**",
                                 "app/**",
                                 "/topic/**",
@@ -65,6 +66,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                // Oauth2 login
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler((request, response, authentication) -> {
+                            // Gọi api success
+                            request.getRequestDispatcher("/api/v1/auth/login/oauth2-google-success").forward(request, response);
+                        })
+                        //Endpoint login
+                        .loginPage("/oauth2/authorization/google")
+                )
                 .addFilterBefore(
                     jwtFilter,
                     UsernamePasswordAuthenticationFilter.class

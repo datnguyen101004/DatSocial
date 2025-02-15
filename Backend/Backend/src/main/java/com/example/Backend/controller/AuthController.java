@@ -7,6 +7,9 @@ import com.example.Backend.dto.Response.TokenResponseDto;
 import com.example.Backend.dto.ResponseDto;
 import com.example.Backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -35,5 +38,10 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseDto<TokenResponseDto> refresh(@RequestBody RefreshTokenDto refreshToken) {
         return ResponseDto.success(authService.refresh(refreshToken));
+    }
+
+    @GetMapping("/login/oauth2-google-success")
+    public ResponseEntity<TokenResponseDto> loginWithGoogle(@AuthenticationPrincipal OidcUser user) {
+        return ResponseEntity.ok(authService.loginWithGoogle(user.getAttribute("email")));
     }
 }
