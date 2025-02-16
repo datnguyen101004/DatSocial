@@ -15,4 +15,6 @@ public interface AuthService {
     TokenResponseDto verify(String code);
 
     TokenResponseDto loginWithGoogle(String email);
+
+    String logout(String accessToken);
 }

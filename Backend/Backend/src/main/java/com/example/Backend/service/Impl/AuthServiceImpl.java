@@ -16,11 +16,13 @@ import com.example.Backend.service.AuthService;
 import com.example.Backend.service.JwtService;
 import com.example.Backend.service.VerifyCodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -33,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final AsyncService asyncService;
     private final VerifyCodeService verifyCodeService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public String register(RegisterDto registerDto) {
@@ -145,5 +148,13 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateAccessToken(email);
         String refreshToken = jwtService.generateRefreshToken(email);
         return new TokenResponseDto(accessToken, refreshToken);
+    }
+
+    @Override
+    //Using redis to delete access token when user logout by Time-To-Live
+    public String logout(String accessToken) {
+        redisTemplate.opsForValue().set(accessToken, "blacklist", Duration.ofMinutes(10));
+        System.out.println(redisTemplate);
+        return "Logout successfully";
     }
 }

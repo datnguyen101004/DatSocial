@@ -44,4 +44,9 @@ public class AuthController {
     public ResponseEntity<TokenResponseDto> loginWithGoogle(@AuthenticationPrincipal OidcUser user) {
         return ResponseEntity.ok(authService.loginWithGoogle(user.getAttribute("email")));
     }
+
+    @GetMapping("/logout")
+    public ResponseDto<String> logout(@RequestParam String accessToken) {
+        return ResponseDto.success(authService.logout(accessToken));
+    }
 }

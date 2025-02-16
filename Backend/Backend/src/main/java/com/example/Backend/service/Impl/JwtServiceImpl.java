@@ -7,7 +7,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
@@ -25,6 +28,8 @@ public class JwtServiceImpl implements JwtService {
     private String EXPIRED_ACCESS_TOKEN;
     @Value("${jwt.expiredRefresh}")
     private String EXPIRED_REFRESH_TOKEN;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public String generateAccessToken(String email) {
         return generateAccessToken(new HashMap<>(), email);
@@ -85,10 +90,17 @@ public class JwtServiceImpl implements JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails){
         try{
             String username = extractUsername(token);
-            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+            //Return true if username in token is equal to username in userDetails and token is not expired and token is not in blacklist
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(token) && isTokenNotInBlacklist(token);
         } catch (Exception e){
             throw new InvalidJwtTokenException("Invalid JWT token");
         }
+    }
+
+    //Check if token is in blacklist
+    //If token is in blacklist, return true
+    private boolean isTokenNotInBlacklist(String token) {
+        return !redisTemplate.hasKey(token);
     }
 
     public boolean isTokenExpired(String token) {
