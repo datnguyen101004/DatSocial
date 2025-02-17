@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class AuthController {
 
     @GetMapping("/login/oauth2-google-success")
     public ResponseEntity<TokenResponseDto> loginWithGoogle(@AuthenticationPrincipal OidcUser user) {
+        System.out.println(Optional.ofNullable(user.getAttribute("email")));
         return ResponseEntity.ok(authService.loginWithGoogle(user.getAttribute("email")));
     }
 

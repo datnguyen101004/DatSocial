@@ -42,3 +42,8 @@ jwt:
   secret-key: 'V2VsYzBtZV90MF9teV9ibDBnX3dlYnMxdGVfRGF0X2lzX0FkbTFu'
   expiredAccess: '2h'
   expiredRefresh: '1d'
+
+rabbitmq:
+  queue_name: ${RABBITMQ_QUEUE_NAME}
+  exchange_name: ${RABBITMQ_EXCHANGE_NAME}
+  routing_key: ${RABBITMQ_ROUTING_KEY}
