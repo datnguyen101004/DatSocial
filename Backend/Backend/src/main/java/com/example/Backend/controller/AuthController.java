@@ -44,7 +44,6 @@ public class AuthController {
 
     @GetMapping("/login/oauth2-google-success")
     public ResponseEntity<TokenResponseDto> loginWithGoogle(@AuthenticationPrincipal OidcUser user) {
-        System.out.println(Optional.ofNullable(user.getAttribute("email")));
         return ResponseEntity.ok(authService.loginWithGoogle(user.getAttribute("email")));
     }
 

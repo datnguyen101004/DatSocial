@@ -1,10 +1,8 @@
 package com.example.Backend.service.Impl;
 
-import com.example.Backend.dto.Response.LikeResponse;
 import com.example.Backend.entity.Blog;
 import com.example.Backend.entity.Like;
 import com.example.Backend.entity.User;
-import com.example.Backend.exception.CustomException.AlreadyException;
 import com.example.Backend.exception.CustomException.NotFoundException;
 import com.example.Backend.repository.BlogRepository;
 import com.example.Backend.repository.LikeRepository;
@@ -13,7 +11,6 @@ import com.example.Backend.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -22,6 +19,7 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     private final BlogRepository blogRepository;
     private final UserRepository userRepository;
+    private final ProducerService producerService;
 
     @Override
     public String like(String type, Long id, String email) {
@@ -39,6 +37,7 @@ public class LikeServiceImpl implements LikeService {
                 else {
                     like.get().setLiked(true);
                     likeRepository.save(like.get());
+                    producerService.likeBlog(blog.getId().toString(), user.getId());
                     return "Like";
                 }
             }
@@ -49,6 +48,7 @@ public class LikeServiceImpl implements LikeService {
                         .liked(true)
                         .build();
                 likeRepository.save(like1);
+                producerService.likeBlog(blog.getId().toString(), user.getId());
                 return "Like";
             }
         }

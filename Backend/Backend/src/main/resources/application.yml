@@ -46,4 +46,3 @@ jwt:
 rabbitmq:
   queue_name: ${RABBITMQ_QUEUE_NAME}
   exchange_name: ${RABBITMQ_EXCHANGE_NAME}
-  routing_key: ${RABBITMQ_ROUTING_KEY}
