@@ -1,4 +1,4 @@
-package com.example.Backend.listener;
+package com.example.Backend.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
